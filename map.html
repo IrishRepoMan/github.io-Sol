@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Solar System - Sol 2990</title>
+    <style>
+        :root {
+            --primary-color: #0d1b2a;
+            --secondary-color: #1b263b;
+            --accent-color: #4cc9f0;
+            --text-color: #e0e1dd;
+            --highlight-color: #ff9f1c;
+            --mars-color: #c1440e;
+            --venus-color: #e56b6f;
+            --mercury-color: #adb5bd;
+            --belt-color: #588157;
+            --jupiter-color: #e63946;
+            --outer-color: #5e548e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 20px;
+        }
+        
+        .solar-system-container {
+            background-color: rgba(13, 27, 42, 0.7);
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            height: 700px;
+        }
+        
+        .solar-system {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .celestial-body {
+            position: absolute;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .celestial-body:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+            z-index: 10;
+        }
+        
+        .sun {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #ff9d00, #ff4d00);
+            left: 50%;
+            top: 50%;
+            box-shadow: 0 0 30px rgba(255, 157, 0, 0.8);
+            z-index: 2;
+        }
+        
+        .mercury {
+            width: 15px;
+            height: 15px;
+            background-color: var(--mercury-color);
+            left: calc(50% + 100px);
+            top: 50%;
+            z-index: 3;
+        }
+        
+        .venus {
+            width: 22px;
+            height: 22px;
+            background-color: var(--venus-color);
+            left: calc(50% + 150px);
+            top: 50%;
+            z-index: 3;
+        }
+        
+        .earth-luna {
+            width: 25px;
+            height: 25px;
+            background: radial-gradient(circle, #2a9d8f, #264653);
+            left: calc(50% + 200px);
+            top: 50%;
+            z-index: 3;
+        }
+        
+        .mars {
+            width: 20px;
+            height: 20px;
+            background-color: var(--mars-color);
+            left: calc(50% + 250px);
+            top: 50%;
+            z-index: 3;
+        }
+        
+        .belt {
+            width: 360px;
+            height: 360px;
+            border: 3px dotted var(--belt-color);
+            opacity: 0.6;
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: opacity 0.3s;
+            z-index: 1;
+        }
+        
+        .belt:hover {
+            opacity: 1;
+        }
+        
+        .jupiter {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(to right, var(--jupiter-color), #a8dadc);
+            left: calc(50% + 350px);
+            top: 50%;
+            z-index: 3;
+        }
+        
+        .saturn {
+            width: 40px;
+            height: 40px;
+            background-color: #d4a373;
+            left: calc(50% + 450px);
+            top: 50%;
+            z-index: 3;
+        }
+        
+        .saturn-rings {
+            position: absolute;
+            width: 60px;
+            height: 20px;
+            border: 2px solid rgba(212, 163, 115, 0.6);
+            border-radius: 50%;
+            left: calc(50% + 450px);
+            top: 50%;
+            transform: translate(-50%, -50%) rotateX(75deg);
+            z-index: 2;
+        }
+        
+        .uranus {
+            width: 30px;
+            height: 30px;
+            background-color: #90e0ef;
+            left: calc(50% + 520px);
+            top: 50%;
+            z-index: 3;
+        }
+        
+        .neptune {
+            width: 30px;
+            height: 30px;
+            background-color: #0077b6;
+            left: calc(50% + 580px);
+            top: 50%;
+            z-index: 3;
+        }
+        
+        .pluto {
+            width: 10px;
+            height: 10px;
+            background-color: #adb5bd;
+            left: calc(50% + 620px);
+            top: 50%;
+            z-index: 3;
+        }
+        
+        .orbit {
+            position: absolute;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        
+        .mercury-orbit {
+            width: 200px;
+            height: 200px;
+        }
+        
+        .venus-orbit {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .earth-orbit {
+            width: 400px;
+            height: 400px;
+        }
+        
+        .mars-orbit {
+            width: 500px;
+            height: 500px;
+        }
+        
+        .jupiter-orbit {
+            width: 700px;
+            height: 700px;
+        }
+        
+        .saturn-orbit {
+            width: 900px;
+            height: 900px;
+        }
+        
+        .uranus-orbit {
+            width: 1040px;
+            height: 1040px;
+        }
+        
+        .neptune-orbit {
+            width: 1160px;
+            height: 1160px;
+        }
+        
+        .pluto-orbit {
+            width: 1240px;
+            height: 1240px;
+        }
+        
+        /* Habitats and stations */
+        .station {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+            transform: translate(-50%, -50%) rotate(45deg);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            z-index: 4;
+        }
+        
+        .station:hover {
+            transform: translate(-50%, -50%) rotate(45deg) scale(1.2);
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+        
+        .earth-orbital-ring {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--accent-color);
+            border-radius: 50%;
+            left: calc(50% + 200px);
+            top: 50%;
+            transform: translate(-50%, -50%) rotateX(75deg);
+            cursor: pointer;
+            z-index: 4;
+        }
+        
+        .mars-orbital-ring {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--accent-color);
+            border-radius: 50%;
+            left: calc(50% + 250px);
+            top: 50%;
+            transform: translate(-50%, -50%) rotateX(75deg);
+            cursor: pointer;
+            z-index: 4;
+        }
+        
+        .jupiter-station-1 {
+            left: calc(50% + 350px - 25px);
+            top: calc(50% - 25px);
+        }
+        
+        .jupiter-station-2 {
+            left: calc(50% + 350px + 25px);
+            top: calc(50% + 25px);
+        }
+        
+        .saturn-station {
+            left: calc(50% + 450px - 30px);
+            top: calc(50% - 30px);
+        }
+        
+        .belt-cluster-1 {
+            left: calc(50% + 170px);
+            top: calc(50% + 130px);
+        }
+        
+        .belt-cluster-2 {
+            left: calc(50% - 110px);
+            top: calc(50% - 160px);
+        }
+        
+        .belt-cluster-3 {
+            left: calc(50% - 170px);
+            top: calc(50% + 90px);
+        }
+        
+        .info-panel {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            padding: 20px;
+            height: 700px;
+            overflow-y: auto;
+        }
+        
+        .info-panel h2 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 5px;
+        }
+        
+        .info-panel h3 {
+            color: var(--highlight-color);
+            margin: 15px 0 8px 0;
+        }
+        
+        .faction-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .mars-tag {
+            background-color: var(--mars-color);
+        }
+        
+        .venus-tag {
+            background-color: var(--venus-color);
+        }
+        
+        .mercury-tag {
+            background-color: var(--mercury-color);
+            color: #000;
+        }
+        
+        .belt-tag {
+            background-color: var(--belt-color);
+        }
+        
+        .jupiter-tag {
+            background-color: var(--jupiter-color);
+        }
+        
+        .outer-tag {
+            background-color: var(--outer-color);
+        }
+        
+        .terra-tag {
+            background-color: #2a9d8f;
+        }
+        
+        .neutral-tag {
+            background-color: #6c757d;
+        }
+        
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            border-bottom: 1px dotted rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+        
+        .stat-name {
+            font-weight: bold;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .view-more {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: var(--accent-color);
+            color: #000;
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .view-more:hover {
+            background-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sol System Interactive Map - 2990 CE</h1>
+    
+    <div class="container">
+        <div class="solar-system-container">
+            <div class="solar-system">
+                <!-- Orbits -->
+                <div class="orbit mercury-orbit"></div>
+                <div class="orbit venus-orbit"></div>
+                <div class="orbit earth-orbit"></div>
+                <div class="orbit mars-orbit"></div>
+                <div class="orbit jupiter-orbit"></div>
+                <div class="orbit saturn-orbit"></div>
+                <div class="orbit uranus-orbit"></div>
+                <div class="orbit neptune-orbit"></div>
+                <div class="orbit pluto-orbit"></div>
+                
+                <!-- Celestial Bodies -->
+                <div class="celestial-body sun" data-id="sun"></div>
+                <div class="celestial-body mercury" data-id="mercury"></div>
+                <div class="celestial-body venus" data-id="venus"></div>
+                <div class="celestial-body earth-luna" data-id="earth-luna"></div>
+                <div class="celestial-body mars" data-id="mars"></div>
+                <div class="belt" data-id="belt"></div>
+                <div class="celestial-body jupiter" data-id="jupiter"></div>
+                <div class="celestial-body saturn" data-id="saturn"></div>
+                <div class="saturn-rings"></div>
+                <div class="celestial-body uranus" data-id="uranus"></div>
+                <div class="celestial-body neptune" data-id="neptune"></div>
+                <div class="celestial-body pluto" data-id="pluto"></div>
+                
+                <!-- Habitats and Stations -->
+                <div class="earth-orbital-ring" data-id="earth-habitats"></div>
+                <div class="mars-orbital-ring" data-id="mars-habitats"></div>
+                <div class="station jupiter-station-1" data-id="jupiter-station-1"></div>
+                <div class="station jupiter-station-2" data-id="jupiter-station-2"></div>
+                <div class="station saturn-station" data-id="titan"></div>
+                <div class="station belt-cluster-1" data-id="belt-cluster-1"></div>
+                <div class="station belt-cluster-2" data-id="belt-cluster-2"></div>
+                <div class="station belt-cluster-3" data-id="belt-cluster-3"></div>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <div id="default-info">
+                <h2>Sol System - 2990 CE</h2>
+                <p>Hover over or click on celestial bodies, habitats, and stations to learn more about them.</p>
+                <p>The Sol System of 2990 CE is home to approximately 5 trillion humans, distributed across numerous habitats, planetary settlements, and space stations. Several major political powers govern different regions of the system, creating a complex web of alliances, dependencies, and tensions.</p>
+                <h3>Major Political Powers</h3>
+                <div class="faction-tag mars-tag">Martian Agricultural Federation</div>
+                <div class="faction-tag venus-tag">Venusian Resource Authority</div>
+                <div class="faction-tag mercury-tag">Mercurian Technological Alliance</div>
+                <div class="faction-tag belt-tag">Belt Council Confederation</div>
+                <div class="faction-tag jupiter-tag">Jovian Economic Alliance</div>
+                <div class="faction-tag outer-tag">Outer System Empire</div>
+                <div class="faction-tag terra-tag">Terran (Earth) Government</div>
+                
+                <p>After nearly a millennium of space colonization, humanity has expanded throughout the entire solar system, establishing a complex civilization with diverse cultures, technologies, and political structures.</p>
+            </div>
+            
+            <!-- Sun -->
+            <div id="sun-info" class="hidden">
+                <h2>Sol (The Sun)</h2>
+                <div class="faction-tag neutral-tag">Neutral Zone</div>
+                
+                <p>The centerpiece of human civilization, Sol provides the energy that powers the vast interplanetary infrastructure. Numerous solar harvesting stations orbit at various distances, collecting energy that is beamed throughout the system via highly efficient laser networks.</p>
+                
+                <h3>Key Statistics</h3>
+                <div class="stat-line">
+                    <span class="stat-name">Solar Harvesting Stations:</span>
+                    <span>1,246 major facilities</span>
+                </div>
+                <div class="stat-line">
+                    <span class="stat-name">Energy Output Harvested:</span>
+                    <span>0.002% of total output</span>
+                </div>
+                <div class="stat-line">
+                    <span class="stat-name">Closest Permanent Facilities:</span>
+                    <span>Mercury L1 Research Stations</span>
+                </div>
+                
+                <p>The management of solar energy resources is governed by the Sol Energy Accord, a complex agreement between all major powers that ensures equitable distribution of this vital resource. Disruption of solar collection facilities is considered an act of war against all humanity.</p>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Mercury -->
+            <div id="mercury-info" class="hidden">
+                <h2>Mercury & Orbital Habitats</h2>
+                <div class="faction-tag mercury-tag">Mercurian Technological Alliance</div>
+                
+                <p>The Mercurian Technological Alliance has established itself as a newer but rapidly advancing power, specializing in technologies adapted to extreme environments. They maintain sophisticated orbital habitats and surface operations despite Mercury's harsh conditions.</p>
+                
+                <p><strong>Population:</strong> 320 billion (official records)</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Specialized in extreme environment technologies</li>
+                    <li>Advanced radiation shielding techniques</li>
+                    <li>Sophisticated orbital habitats</li>
+                    <li>Surface mining operations</li>
+                </ul>
+                
+                <p><strong>Dark Secret:</strong> Unknown to the rest of the system, Mercury harbors a massive slave-based economy that would provoke system-wide intervention if discovered. This slave system provides Mercury with significant economic advantages while allowing them to bolster their official population numbers.</p>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Venus -->
+            <div id="venus-info" class="hidden">
+                <h2>Venus & Atmospheric Habitats</h2>
+                <div class="faction-tag venus-tag">Venusian Resource Authority</div>
+                
+                <p>The Venusian Resource Authority operates as a partner to Terra (Earth), extracting valuable resources through mining operations in Venus's atmosphere and surface. These resources are shared with Mars through established trade agreements, creating important economic interdependencies between the inner planets.</p>
+                
+                <p><strong>Population:</strong> 350 billion</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Floating cloud cities in the upper atmosphere</li>
+                    <li>Resource extraction operations</li>
+                    <li>Close economic ties with Earth</li>
+                    <li>Advanced atmospheric processing technologies</li>
+                </ul>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Earth-Luna -->
+            <div id="earth-luna-info" class="hidden">
+                <h2>Earth & Luna</h2>
+                <div class="faction-tag terra-tag">Terran Government</div>
+                
+                <p>Earth gradually transitioned from being the center of human civilization to a partially rewilded world. By the 24th century, most of Earth's heavy industry had moved to space, allowing significant ecological restoration. In the current era, Earth serves primarily as a natural preserve and historical heritage site.</p>
+                
+                <p><strong>Earth Surface Population:</strong> 1.2 billion<br>
+                <strong>Earth Orbital Habitats:</strong> 1.2 trillion</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Ecological restoration zones</li>
+                    <li>Historical preservation areas</li>
+                    <li>Limited surface settlements</li>
+                    <li>Massive orbital habitat complexes</li>
+                </ul>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Earth Habitats -->
+            <div id="earth-habitats-info" class="hidden">
+                <h2>Earth Orbital Habitat Complexes</h2>
+                <div class="faction-tag terra-tag">Terran Government</div>
+                
+                <p>The vast majority of Earth's associated population lives in enormous orbital habitat complexes arranged in stable formations around the planet. These represent some of the oldest continuously inhabited structures in the solar system, with the oldest sections dating back to the late 21st century.</p>
+                
+                <p><strong>Population:</strong> 1.2 trillion</p>
+                
+                <h3>Major Habitat Clusters</h3>
+                <ul>
+                    <li><strong>New Terran Ring:</strong> The largest continuous habitat structure, housing over 300 billion people</li>
+                    <li><strong>Lagrange Complexes:</strong> Major settlements at Earth-Luna L4 and L5 points</li>
+                    <li><strong>Heritage Stations:</strong> Original habitats preserved as living museums</li>
+                </ul>
+                
+                <p>Earth orbital habitats emphasize naturalistic designs with extensive internal parklands, reflecting their cultural connection to humanity's original home.</p>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Mars -->
+            <div id="mars-info" class="hidden">
+                <h2>Mars & Agricultural Zones</h2>
+                <div class="faction-tag mars-tag">Martian Agricultural Federation</div>
+                
+                <p>The Martian Agricultural Federation controls the majority of the system's food production through their terraformed agricultural zones. Mars has been partially terraformed through a patchwork of massive domes, each creating self-contained atmospheres for agricultural production.</p>
+                
+                <p><strong>Surface Population:</strong> 50 billion<br>
+                <strong>Orbital Population:</strong> 850 billion</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Terraformed agricultural domes</li>
+                    <li>Political structure based on Agricultural Zones (AZs)</li>
+                    <li>Water rights and atmospheric processing as political leverage</li>
+                    <li>Primary food producer for the system</li>
+                </ul>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Mars Habitats -->
+            <div id="mars-habitats-info" class="hidden">
+                <h2>Mars Orbital Habitats</h2>
+                <div class="faction-tag mars-tag">Martian Agricultural Federation</div>
+                
+                <p>While Mars is famous for its surface agricultural zones, the vast majority of its population resides in orbital habitats. These citizens travel to the surface primarily for work shifts in the agricultural facilities.</p>
+                
+                <p><strong>Population:</strong> 850 billion</p>
+                
+                <h3>Major Habitat Features</h3>
+                <ul>
+                    <li>Phobos and Deimos heavily developed as habitat cores</li>
+                    <li>Ring stations in synchronous orbit above major agricultural zones</li>
+                    <li>Specialized transit systems for surface-orbit commuting</li>
+                </ul>
+                
+                <p>Martian orbital habitats emphasize efficiency and practicality, with design elements that reflect their agricultural heritage.</p>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Belt -->
+            <div id="belt-info" class="hidden">
+                <h2>Asteroid Belt</h2>
+                <div class="faction-tag belt-tag">Belt Council Confederation</div>
+                
+                <p>The Belt Council Confederation unites numerous independent habitat clusters throughout the asteroid belt. Despite significant cultural and political diversity among Belt communities, they maintain strong solidarity when dealing with other powers.</p>
+                
+                <p><strong>Population:</strong> 750 billion</p>
+                
+                <h3>Government Structure</h3>
+                <p>Each community has representation on the council, with voting weight determined by population and resource contribution. The Belt's control over significant mineral resources and strategic positioning gives them substantial influence in system-wide politics.</p>
+                
+                <h3>Major Asteroid Clusters</h3>
+                <ul>
+                    <li><strong>Ceres Complex:</strong> The administrative center of the Belt</li>
+                    <li><strong>Vesta Mining Coalition:</strong> Resource extraction hub</li>
+                    <li><strong>Pallas Scientific Cooperative:</strong> Research focused settlements</li>
+                </ul>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Jupiter -->
+            <div id="jupiter-info" class="hidden">
+                <h2>Jupiter & Its Moons</h2>
+                <div class="faction-tag jupiter-tag">Jovian Economic Alliance</div>
+                
+                <p>The Jovian Economic Alliance has leveraged Jupiter's position and resources (particularly Helium-3 from its atmosphere) to establish itself as a financial and technological superpower. Their control over energy resources and strategic position between the inner and outer system makes them crucial players in system-wide trade and politics.</p>
+                
+                <p><strong>Population:</strong> 480 million</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Helium-3 extraction from Jupiter's atmosphere</li>
+                    <li>Financial and technological development</li>
+                    <li>Strategic position between inner and outer systems</li>
+                    <li>Development across multiple moons</li>
+                </ul>
+                
+                <h3>Major Settlements</h3>
+                <ul>
+                    <li><strong>Io:</strong> Energy processing facilities</li>
+                    <li><strong>Europa:</strong> Research centers and luxury habitats</li>
+                    <li><strong>Ganymede:</strong> Administrative center</li>
+                    <li><strong>Callisto:</strong> Manufacturing and resource processing</li>
+                </ul>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Saturn -->
+            <div id="saturn-info" class="hidden">
+                <h2>Saturn System</h2>
+                <div class="faction-tag outer-tag">Outer System Empire</div>
+                
+                <p>Saturn forms a crucial part of the Outer System Empire, which claims sovereignty over Saturn, Uranus, and Neptune. The empire operates through a system of Great Families (Consortiums) who control specific industries or resources across all three planetary systems, owing allegiance to the imperial throne on Titan.</p>
+                
+                <p><strong>Population:</strong> 180 million</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Titan serves as the imperial capital</li>
+                    <li>Ring mining operations</li>
+                    <li>Major habitats on Enceladus and Mimas</li>
+                    <li>Exotic materials production</li>
+                </ul>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Uranus -->
+            <div id="uranus-info" class="hidden">
+                <h2>Uranus System</h2>
+                <div class="faction-tag outer-tag">Outer System Empire</div>
+                
+                <p>Uranus represents the second major sphere of the Outer System Empire. The planet's unique axial tilt creates interesting challenges and opportunities for settlements in the region.</p>
+                
+                <p><strong>Population:</strong> 80 million</p>
+                
+                <h3>Historical Significance</h3>
+                <p>The Uranian Conflict between Jupiter and the Outer System Empire serves as a reminder of the potential for larger-scale war, though the conflict was ultimately resolved through diplomatic means and established current territorial boundaries.</p>
+                
+                <h3>Major Settlements</h3>
+                <ul>
+                    <li><strong>Miranda:</strong> Military installations</li>
+                    <li><strong>Ariel:</strong> Research facilities</li>
+                    <li><strong>Titania:</strong> Administrative center for the Uranian region</li>
+                </ul>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Neptune -->
+            <div id="neptune-info" class="hidden">
+                <h2>Neptune System</h2>
+                <div class="faction-tag outer-tag">Outer System Empire</div>
+                
+                <p>Neptune forms the outer boundary of significant human settlement, representing the third sphere of the Outer System Empire. Its distance from the sun creates unique challenges for habitation.</p>
+                
+                <p><strong>Population:</strong> 60 million</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Triton serves as the administrative center</li>
+                    <li>Specialized cold-environment technologies</li>
+                    <li>Deep space observation facilities</li>
+                    <li>Gateway to outer system research missions</li>
+                </ul>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Pluto -->
+            <div id="pluto-info" class="hidden">
+                <h2>Pluto Research Station</h2>
+                <div class="faction-tag neutral-tag">Neutral Scientific Zone</div>
+                
+                <p>Pluto serves as a scientific outpost accessible to all factions, functioning as a forward observatory and research station. Its non-aligned status is maintained through multi-lateral agreements between major powers.</p>
+                
+                <p><strong>Population:</strong> 250,000 (rotating scientific personnel)</p>
+                
+                <h3>Research Focus</h3>
+                <ul>
+                    <li>Deep space astronomy</li>
+                    <li>Kuiper Belt exploration</li>
+                    <li>Interstellar probe launching facilities</li>
+                    <li>Failed interstellar mission analysis</li>
+                </ul>
+                
+                <p>The Pluto Research Station represents one of the few truly collaborative endeavors in the solar system, with scientists from all factions working together under strict political neutrality agreements.</p>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Belt Cluster 1 -->
+            <div id="belt-cluster-1-info" class="hidden">
+                <h2>Ceres Complex</h2>
+                <div class="faction-tag belt-tag">Belt Council Confederation</div>
+                
+                <p>The Ceres Complex serves as the administrative center of the Belt Council Confederation, housing the Council chambers and major diplomatic facilities for interactions with other factions.</p>
+                
+                <p><strong>Population:</strong> 85 billion</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Belt Council Chambers</li>
+                    <li>Major trade hub</li>
+                    <li>Cultural center with universities and arts facilities</li>
+                    <li>Diplomatic quarter for all major factions</li>
+                </ul>
+                
+                <p>The Ceres Complex demonstrates the Belt's cooperative social structures focused on mutual support and resource sharing. Their cultural practices emphasize community bonds and practical skills.</p>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Belt Cluster 2 -->
+            <div id="belt-cluster-2-info" class="hidden">
+                <h2>Vesta Mining Coalition</h2>
+                <div class="faction-tag belt-tag">Belt Council Confederation</div>
+                
+                <p>The Vesta Mining Coalition represents one of the most productive resource extraction centers in the Belt, specializing in rare metals and industrial minerals essential for habitat construction throughout the system.</p>
+                
+                <p><strong>Population:</strong> 65 billion</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Extensive mining operations</li>
+                    <li>Industrial processing facilities</li>
+                    <li>Transportation hub for resources</li>
+                    <li>Resource-focused governance model</li>
+                </ul>
+                
+                <p>The Mining Coalition maintains a more industrialized culture than other Belt clusters, with social structures built around production efficiency and resource management.</p>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Belt Cluster 3 -->
+            <div id="belt-cluster-3-info" class="hidden">
+                <h2>Pallas Scientific Cooperative</h2>
+                <div class="faction-tag belt-tag">Belt Council Confederation</div>
+                
+                <p>The Pallas Scientific Cooperative focuses on research and development, particularly in fields related to habitat technology, asteroid manipulation, and resource utilization efficiency.</p>
+                
+                <p><strong>Population:</strong> 45 billion</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Research laboratories</li>
+                    <li>Educational institutions</li>
+                    <li>Experimental habitat designs</li>
+                    <li>Knowledge-focused governance model</li>
+                </ul>
+                
+                <p>The Scientific Cooperative maintains a more academic culture than other Belt clusters, with social structures that prioritize knowledge sharing and technological advancement.</p>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Jupiter Station 1 -->
+            <div id="jupiter-station-1-info" class="hidden">
+                <h2>Ganymede Administrative Center</h2>
+                <div class="faction-tag jupiter-tag">Jovian Economic Alliance</div>
+                
+                <p>The Ganymede Administrative Center serves as the capital of the Jovian Economic Alliance, housing its governance facilities, financial institutions, and central planning operations.</p>
+                
+                <p><strong>Population:</strong> 120 million</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Jovian Central Bank</li>
+                    <li>Alliance Governance Council</li>
+                    <li>Financial district</li>
+                    <li>Luxury residential areas</li>
+                </ul>
+                
+                <p>Jovian society has evolved a meritocratic ethos centered on technological innovation and economic achievement. Their cultural productions showcase technical sophistication and efficiency.</p>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Jupiter Station 2 -->
+            <div id="jupiter-station-2-info" class="hidden">
+                <h2>Callisto Manufacturing Complex</h2>
+                <div class="faction-tag jupiter-tag">Jovian Economic Alliance</div>
+                
+                <p>The Callisto Manufacturing Complex serves as the industrial heart of the Jovian Economic Alliance, producing sophisticated technologies and processing resources from Jupiter's atmosphere.</p>
+                
+                <p><strong>Population:</strong> 95 million</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Helium-3 processing facilities</li>
+                    <li>Ship construction yards</li>
+                    <li>Industrial habitats</li>
+                    <li>Transportation hub</li>
+                </ul>
+                
+                <p>The manufacturing complex demonstrates the Jovian emphasis on efficiency and production, with their cultural values centered on contribution to collective prosperity.</p>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+            
+            <!-- Titan -->
+            <div id="titan-info" class="hidden">
+                <h2>Titan Imperial Capital</h2>
+                <div class="faction-tag outer-tag">Outer System Empire</div>
+                
+                <p>Titan serves as the imperial capital of the Outer System Empire, housing the imperial palace, government facilities, and the residences of the Great Family representatives.</p>
+                
+                <p><strong>Population:</strong> 75 million</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li>Imperial Palace</li>
+                    <li>Great Family Consort Houses</li>
+                    <li>Imperial bureaucracy facilities</li>
+                    <li>Cultural institutions preserving imperial traditions</li>
+                </ul>
+                
+                <p>The Outer System Empire has developed elaborate courtly traditions and status hierarchies, with cultural expressions emphasizing personal loyalty, formal honor codes, and sophisticated social maneuvering.</p>
+                
+                <a href="#" class="view-more">View Detailed Information</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const celestialBodies = document.querySelectorAll('.celestial-body, .belt, .earth-orbital-ring, .mars-orbital-ring, .station');
+            const infoPanels = document.querySelectorAll('.info-panel > div');
+            const defaultInfo = document.getElementById('default-info');
+            
+            // Show info on hover
+            celestialBodies.forEach(body => {
+                body.addEventListener('mouseenter', function() {
+                    const id = this.getAttribute('data-id');
+                    showInfo(id);
+                });
+                
+                body.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const id = this.getAttribute('data-id');
+                    // Here you could redirect to a detailed page instead
+                    // window.location.href = id + '.html';
+                    // For now, just show the info
+                    showInfo(id);
+                });
+            });
+            
+            // Reset to default when mouse leaves the solar system container
+            document.querySelector('.solar-system-container').addEventListener('mouseleave', function() {
+                hideAllInfo();
+                defaultInfo.classList.remove('hidden');
+            });
+            
+            // View more links
+            document.querySelectorAll('.view-more').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Here you would redirect to a detailed page
+                    const parentPanel = this.closest('div[id]');
+                    const id = parentPanel.id.replace('-info', '');
+                    alert('This would navigate to a detailed page about: ' + id);
+                    // window.location.href = id + '.html';
+                });
+            });
+            
+            function showInfo(id) {
+                hideAllInfo();
+                const infoPanel = document.getElementById(id + '-info');
+                if (infoPanel) {
+                    infoPanel.classList.remove('hidden');
+                } else {
+                    defaultInfo.classList.remove('hidden');
+                }
+            }
+            
+            function hideAllInfo() {
+                infoPanels.forEach(panel => {
+                    panel.classList.add('hidden');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
