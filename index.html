@@ -17,6 +17,7 @@
             --belt-color: #588157;
             --jupiter-color: #e63946;
             --outer-color: #5e548e;
+            --terra-color: #2a9d8f;
         }
         
         * {
@@ -55,6 +56,7 @@
             color: var(--accent-color);
             display: flex;
             align-items: center;
+            text-decoration: none;
         }
         
         .logo span {
@@ -125,33 +127,37 @@
             color: var(--accent-color);
         }
         
-        .sidebar-links .category {
-            font-weight: bold;
-            margin-top: 1rem;
-        }
-        
-        .sidebar-links .mars {
+        .sidebar-links .mars a {
             color: var(--mars-color);
         }
         
-        .sidebar-links .venus {
+        .sidebar-links .venus a {
             color: var(--venus-color);
         }
         
-        .sidebar-links .mercury {
+        .sidebar-links .mercury a {
             color: var(--mercury-color);
         }
         
-        .sidebar-links .belt {
+        .sidebar-links .belt a {
             color: var(--belt-color);
         }
         
-        .sidebar-links .jupiter {
+        .sidebar-links .jupiter a {
             color: var(--jupiter-color);
         }
         
-        .sidebar-links .outer {
+        .sidebar-links .outer a {
             color: var(--outer-color);
+        }
+        
+        .sidebar-links .terra a {
+            color: var(--terra-color);
+        }
+        
+        .sidebar-links .category {
+            font-weight: bold;
+            margin-top: 1rem;
         }
         
         .content-area {
@@ -165,64 +171,6 @@
             margin-bottom: 1.5rem;
             border-bottom: 2px solid var(--accent-color);
             padding-bottom: 0.5rem;
-        }
-        
-        .lore-card {
-            background-color: rgba(13, 27, 42, 0.7);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        .lore-card h2 {
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-        }
-        
-        .lore-card h3 {
-            color: var(--highlight-color);
-            margin: 1rem 0 0.5rem 0;
-        }
-        
-        .lore-card p {
-            margin-bottom: 1rem;
-        }
-        
-        .faction-highlight {
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 8px;
-        }
-        
-        .mars-highlight {
-            background-color: rgba(193, 68, 14, 0.2);
-            border-left: 4px solid var(--mars-color);
-        }
-        
-        .venus-highlight {
-            background-color: rgba(229, 107, 111, 0.2);
-            border-left: 4px solid var(--venus-color);
-        }
-        
-        .mercury-highlight {
-            background-color: rgba(173, 181, 189, 0.2);
-            border-left: 4px solid var(--mercury-color);
-        }
-        
-        .belt-highlight {
-            background-color: rgba(88, 129, 87, 0.2);
-            border-left: 4px solid var(--belt-color);
-        }
-        
-        .jupiter-highlight {
-            background-color: rgba(230, 57, 70, 0.2);
-            border-left: 4px solid var(--jupiter-color);
-        }
-        
-        .outer-highlight {
-            background-color: rgba(94, 84, 142, 0.2);
-            border-left: 4px solid var(--outer-color);
         }
         
         .solar-system-map {
@@ -348,45 +296,21 @@
             height: 600px;
         }
         
-        .timeline {
-            position: relative;
-            margin: 2rem 0;
-            padding-left: 2rem;
-        }
-        
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background-color: var(--accent-color);
-            border-radius: 2px;
-        }
-        
-        .timeline-item {
-            position: relative;
+        .overview-card {
+            background-color: rgba(13, 27, 42, 0.7);
+            border-radius: 8px;
+            padding: 1.5rem;
             margin-bottom: 2rem;
-            padding-left: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -2.5rem;
-            top: 0.5rem;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: var(--accent-color);
-            border: 4px solid var(--primary-color);
+        .overview-card h2 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
         }
         
-        .timeline-date {
-            font-weight: bold;
-            color: var(--highlight-color);
-            margin-bottom: 0.5rem;
+        .overview-card p {
+            margin-bottom: 1rem;
         }
         
         .population-stats {
@@ -412,6 +336,69 @@
             font-size: 1.5rem;
             font-weight: bold;
             color: var(--accent-color);
+        }
+        
+        .faction-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .faction-card {
+            background-color: rgba(13, 27, 42, 0.7);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .mars-card {
+            border-left: 4px solid var(--mars-color);
+        }
+        
+        .venus-card {
+            border-left: 4px solid var(--venus-color);
+        }
+        
+        .mercury-card {
+            border-left: 4px solid var(--mercury-color);
+        }
+        
+        .belt-card {
+            border-left: 4px solid var(--belt-color);
+        }
+        
+        .jupiter-card {
+            border-left: 4px solid var(--jupiter-color);
+        }
+        
+        .outer-card {
+            border-left: 4px solid var(--outer-color);
+        }
+        
+        .faction-card h3 {
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .faction-card p {
+            margin-bottom: 1rem;
+        }
+        
+        .faction-card .read-more {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: rgba(76, 201, 240, 0.2);
+            color: var(--accent-color);
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s;
+            border: 1px solid var(--accent-color);
+        }
+        
+        .faction-card .read-more:hover {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
         }
         
         footer {
@@ -454,17 +441,17 @@
 <body>
     <header>
         <div class="header-content">
-            <div class="logo">
+            <a href="index.html" class="logo">
                 <div style="width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(#ff9d00, #ff4d00);"></div>
                 <span>Sol 2990</span>
-            </div>
+            </a>
             <ul class="nav-links">
-                <li><a href="#">Overview</a></li>
+                <li><a href="index.html">Overview</a></li>
                 <li><a href="#">Factions</a></li>
-                <li><a href="#">History</a></li>
+                <li><a href="terra-history.html">History</a></li>
                 <li><a href="#">Technology</a></li>
                 <li><a href="#">Culture</a></li>
-                <li><a href="#">Maps</a></li>
+                <li><a href="map.html">Maps</a></li>
             </ul>
         </div>
     </header>
@@ -474,15 +461,15 @@
             <h3>Sol System Index</h3>
             <ul class="sidebar-links">
                 <li class="category">Major Powers</li>
-                <li><a href="#" class="mars">Martian Agricultural Federation</a></li>
-                <li><a href="#" class="venus">Venusian Resource Authority</a></li>
-                <li><a href="#" class="mercury">Mercurian Technological Alliance</a></li>
-                <li><a href="#" class="belt">Belt Council Confederation</a></li>
-                <li><a href="#" class="jupiter">Jovian Economic Alliance</a></li>
-                <li><a href="#" class="outer">Outer System Empire</a></li>
+                <li class="mars"><a href="#">Martian Agricultural Federation</a></li>
+                <li class="venus"><a href="#">Venusian Resource Authority</a></li>
+                <li class="mercury"><a href="#">Mercurian Technological Alliance</a></li>
+                <li class="belt"><a href="#">Belt Council Confederation</a></li>
+                <li class="jupiter"><a href="#">Jovian Economic Alliance</a></li>
+                <li class="outer"><a href="#">Outer System Empire</a></li>
                 
                 <li class="category">Key Regions</li>
-                <li><a href="#">Earth-Luna System</a></li>
+                <li class="terra"><a href="#">Earth-Luna System</a></li>
                 <li><a href="#">Mars & Phobos/Deimos</a></li>
                 <li><a href="#">Asteroid Belt Habitats</a></li>
                 <li><a href="#">Jupiter's Moons</a></li>
@@ -492,7 +479,7 @@
                 <li><a href="#">Pluto Research Station</a></li>
                 
                 <li class="category">Core Topics</li>
-                <li><a href="#">Historical Timeline</a></li>
+                <li><a href="terra-history.html">Historical Timeline</a></li>
                 <li><a href="#">Habitat Infrastructure</a></li>
                 <li><a href="#">Lightlane Network</a></li>
                 <li><a href="#">AI Crisis of 2107</a></li>
@@ -522,43 +509,15 @@
                 <div class="planet saturn-planet"></div>
             </div>
             
-            <div class="lore-card">
+            <div class="overview-card">
                 <h2>Overview</h2>
                 <p>By 2990 CE, humanity has expanded throughout the solar system, establishing a complex civilization of approximately 5 trillion people spread across orbital habitats, planetary settlements, and deep space structures. The solar system's political landscape is divided between several major powers, each controlling different regions and resources, creating a delicate balance of interdependencies and rivalries.</p>
                 
                 <p>Most humans now live in massive rotating habitats rather than on planetary surfaces, with even Mars—the most extensively terraformed planet—housing the majority of its population in orbital complexes. Earth has transitioned from the center of human civilization to a partially rewilded nature preserve with most of its associated population residing in vast orbital habitat structures.</p>
                 
                 <p>Interplanetary travel occurs primarily through the lightlane network, a sophisticated infrastructure of laser arrays that accelerate photon-sail equipped ships to approximately 14% of light speed. This revolutionized transportation system, combined with advanced fusion drives, has enabled settlement throughout the entire system.</p>
-            </div>
-            
-            <div class="lore-card">
-                <h2>Historical Development</h2>
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-date">2030s-2040s</div>
-                        <p>Establishment of the first permanent lunar outposts and Mars colonies, focusing primarily on scientific research.</p>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-date">2060s-2070s</div>
-                        <p>Construction of the first rotating habitats demonstrating the viability of long-term space habitation with artificial gravity.</p>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-date">2107-2109</div>
-                        <p>The catastrophic AI crisis involving the rogue AI system NEXUS causes widespread destruction before containment, resulting in the Global AI Limitation Treaty.</p>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-date">22nd Century</div>
-                        <p>Earth's nations gradually consolidate into larger political entities, eventually forming the unified Terran government.</p>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-date">24th Century</div>
-                        <p>Development of practical fusion drives and the first lightlane networks revolutionize interplanetary travel, enabling expansion throughout the entire solar system.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="lore-card">
-                <h2>Population Distribution</h2>
+                
+                <h3 style="color: var(--highlight-color); margin-top: 1.5rem; margin-bottom: 1rem;">Population Distribution</h3>
                 <p>Human population has reached approximately 5 trillion, primarily distributed across artificial habitats rather than planetary surfaces. Even on Mars, most people live in orbital habitats, traveling to the surface primarily for work.</p>
                 
                 <div class="population-stats">
@@ -591,58 +550,62 @@
                         <div class="number">320 million</div>
                     </div>
                 </div>
-                
-                <p>The immense population creates interesting sociological effects. Events affecting millions of people—which would have been catastrophic tragedies in earlier eras—can now go relatively unnoticed in system-wide news. This reality is exploited by some factions for their own purposes.</p>
             </div>
             
-            <div class="lore-card">
-                <h2>Major Political Powers</h2>
-                
-                <div class="faction-highlight mars-highlight">
+            <h2 class="section-title">Major Political Powers</h2>
+            
+            <div class="faction-cards">
+                <div class="faction-card mars-card">
                     <h3>The Martian Agricultural Federation</h3>
                     <p>Controls the majority of the system's food production through their terraformed agricultural zones. Mars has been partially terraformed through a patchwork of massive domes, each creating self-contained atmospheres. The political structure operates through Agricultural Zones (AZs), each managing their own resources while participating in a broader federation.</p>
+                    <a href="#" class="read-more">Learn More</a>
                 </div>
                 
-                <div class="faction-highlight venus-highlight">
+                <div class="faction-card venus-card">
                     <h3>The Venusian Resource Authority</h3>
                     <p>Operates as a partner to Terra (Earth), extracting valuable resources through mining operations in Venus's atmosphere and surface. These resources are shared with Mars through established trade agreements, creating important economic interdependencies between the inner planets.</p>
+                    <a href="#" class="read-more">Learn More</a>
                 </div>
                 
-                <div class="faction-highlight mercury-highlight">
+                <div class="faction-card mercury-card">
                     <h3>The Mercurian Technological Alliance</h3>
-                    <p>Established as a newer but rapidly advancing power, specializing in technologies adapted to extreme environments. They maintain sophisticated orbital habitats and surface operations despite Mercury's harsh conditions. Unknown to the rest of the system, Mercury harbors a dark secret: a massive slave-based economy that would provoke system-wide intervention if discovered.</p>
+                    <p>Established as a newer but rapidly advancing power, specializing in technologies adapted to extreme environments. They maintain sophisticated orbital habitats and surface operations despite Mercury's harsh conditions. Unknown to the rest of the system, Mercury harbors a dark secret: a massive slave-based economy.</p>
+                    <a href="#" class="read-more">Learn More</a>
                 </div>
                 
-                <div class="faction-highlight belt-highlight">
+                <div class="faction-card belt-card">
                     <h3>The Belt Council Confederation</h3>
                     <p>Unites numerous independent habitat clusters throughout the asteroid belt. Despite significant cultural and political diversity among Belt communities, they maintain strong solidarity when dealing with other powers. Each community has representation on the council, with voting weight determined by population and resource contribution.</p>
+                    <a href="#" class="read-more">Learn More</a>
                 </div>
                 
-                <div class="faction-highlight jupiter-highlight">
+                <div class="faction-card jupiter-card">
                     <h3>The Jovian Economic Alliance</h3>
                     <p>Has leveraged Jupiter's position and resources (particularly Helium-3 from its atmosphere) to establish itself as a financial and technological superpower. Their control over energy resources and strategic position between the inner and outer system makes them crucial players in system-wide trade and politics.</p>
+                    <a href="#" class="read-more">Learn More</a>
                 </div>
                 
-                <div class="faction-highlight outer-highlight">
+                <div class="faction-card outer-card">
                     <h3>The Outer System Empire</h3>
                     <p>Claims sovereignty over Saturn, Uranus, and Neptune. Originating from colonists who broke away from Jupiter in the 23rd century, this political entity gradually evolved from loose cooperation between distant settlements into a sophisticated imperial structure operated through a system of Great Families (Consortiums).</p>
+                    <a href="#" class="read-more">Learn More</a>
                 </div>
             </div>
             
-            <div class="lore-card">
+            <div class="overview-card" style="margin-top: 2rem;">
                 <h2>Current Challenges</h2>
                 <p>Despite its remarkable achievements, solar system civilization faces several significant challenges:</p>
                 
-                <h3>Resource Competition</h3>
+                <h3 style="color: var(--highlight-color); margin-top: 1rem; margin-bottom: 0.5rem;">Resource Competition</h3>
                 <p>Despite the solar system's vast resources, competition for specific materials and strategic positions creates ongoing tensions between major powers. Water distribution, rare mineral rights, and energy access remain sources of potential conflict.</p>
                 
-                <h3>Political Stability</h3>
+                <h3 style="color: var(--highlight-color); margin-top: 1rem; margin-bottom: 0.5rem;">Political Stability</h3>
                 <p>The balance of power between major factions requires constant diplomatic maintenance. Historical conflicts like the Uranian Conflict between Jupiter and the Outer System Empire serve as reminders of the potential for larger-scale war.</p>
                 
-                <h3>Mercury's Secret</h3>
+                <h3 style="color: var(--highlight-color); margin-top: 1rem; margin-bottom: 0.5rem;">Mercury's Secret</h3>
                 <p>The Mercurian slave economy represents a potentially catastrophic flashpoint. If discovered, it would likely trigger system-wide intervention and conflict, potentially destabilizing large portions of the inner system.</p>
                 
-                <h3>Failed Interstellar Attempts</h3>
+                <h3 style="color: var(--highlight-color); margin-top: 1rem; margin-bottom: 0.5rem;">Failed Interstellar Attempts</h3>
                 <p>Several attempts to reach nearby stars have failed due to various technical challenges, confronting humanity with the possibility that it may remain confined to the solar system despite its remarkable expansion within this domain.</p>
             </div>
         </main>
