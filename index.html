@@ -4,47 +4,174 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sol</title>
-    <link rel="stylesheet" href="styles.css">
     <style>
-        /* Add some debug styling to make elements visible */
-        #solar-system {
-            border: 1px solid red;
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
         }
-        .celestial-body {
-            border: 1px solid yellow;
+        
+        #universe {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #solar-system {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 5000px;
+            height: 5000px;
+        }
+        
+        .sun {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: orange;
+            border-radius: 50%;
+            top: 2450px;
+            left: 2450px;
+            box-shadow: 0 0 50px yellow;
+        }
+        
+        .planet {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: blue;
+            border-radius: 50%;
+        }
+        
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        
+        #debug {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px;
+            z-index: 100;
         }
     </style>
 </head>
 <body>
     <div id="universe">
         <div id="solar-system">
-            <!-- The sun -->
-            <div class="celestial-body sun" data-name="Sol">
-                <div class="body-content"></div>
-                <div class="tooltip">
-                    <h3>Sol</h3>
-                    <p>Our solar system's star, providing energy to all planets and supporting life on Earth.</p>
-                </div>
-            </div>
-        </div>
-        <div id="controls">
-            <button id="zoom-in">+</button>
-            <button id="zoom-out">-</button>
-            <button id="reset">Reset View</button>
+            <div class="sun"></div>
+            <!-- Planets will be added by JavaScript -->
         </div>
     </div>
     
-    <!-- Add debug info -->
-    <div style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 10px; z-index: 1000;">
-        <p id="debug-info">Debug Info: Waiting for script to load...</p>
+    <div id="controls">
+        <button id="zoom-in">+</button>
+        <button id="zoom-out">-</button>
+        <button id="reset">Reset</button>
     </div>
+    
+    <div id="debug">Loading...</div>
     
     <script>
-        // Add inline debug code
-        console.log("Inline script running!");
-        document.getElementById('debug-info').textContent = "Debug Info: Inline script executed";
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const debug = document.getElementById('debug');
+            debug.textContent = "DOM loaded";
+            
+            const solarSystem = document.getElementById('solar-system');
+            const zoomIn = document.getElementById('zoom-in');
+            const zoomOut = document.getElementById('zoom-out');
+            const reset = document.getElementById('reset');
+            
+            // Check if elements exist
+            if (!solarSystem) debug.textContent += " | Solar system missing";
+            if (!zoomIn) debug.textContent += " | Zoom in missing";
+            if (!zoomOut) debug.textContent += " | Zoom out missing";
+            if (!reset) debug.textContent += " | Reset missing";
+            
+            // Variables for zooming and panning
+            let scale = 0.2;
+            let offsetX = 0;
+            let offsetY = 0;
+            let isDragging = false;
+            let startX, startY;
+            
+            // Update transform
+            function updateTransform() {
+                solarSystem.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+                debug.textContent = `Scale: ${scale.toFixed(2)}, X: ${offsetX}, Y: ${offsetY}`;
+            }
+            
+            // Add a simple planet
+            function addPlanet() {
+                const planet = document.createElement('div');
+                planet.className = 'planet';
+                planet.style.top = '2450px';
+                planet.style.left = '2700px'; // 250px to the right of the sun
+                solarSystem.appendChild(planet);
+                debug.textContent += " | Planet added";
+            }
+            
+            // Initialize
+            updateTransform();
+            addPlanet();
+            
+            // Add event listeners
+            zoomIn.addEventListener('click', function() {
+                scale = Math.min(scale * 1.2, 1.5);
+                updateTransform();
+            });
+            
+            zoomOut.addEventListener('click', function() {
+                scale = Math.max(scale * 0.8, 0.1);
+                updateTransform();
+            });
+            
+            reset.addEventListener('click', function() {
+                scale = 0.2;
+                offsetX = 0;
+                offsetY = 0;
+                updateTransform();
+            });
+            
+            // Drag to pan
+            solarSystem.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                startX = e.clientX - offsetX;
+                startY = e.clientY - offsetY;
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                offsetX = e.clientX - startX;
+                offsetY = e.clientY - startY;
+                updateTransform();
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+        });
     </script>
-    
-    <script src="script.js?v=1"></script>
 </body>
 </html>
