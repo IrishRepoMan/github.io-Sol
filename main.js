@@ -110,40 +110,62 @@ document.addEventListener('DOMContentLoaded', function() {
     addAsteroidBelt();
     
     // Zoom and pan functionality
-    let currentScale = 1;
-    let isPanning = false;
-    let startPoint = { x: 0, y: 0 };
-    let viewBox = { x: 0, y: 0, width: 1000, height: 600 };
+let currentScale = 1;
+let isPanning = false;
+let startPoint = { x: 0, y: 0 };
+let viewBox = { x: 0, y: 0, width: 1000, height: 600 };
 
-    function updateViewBox() {
-        svgMap.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+// Define limits
+const ZOOM_MIN = 0.5;  // Maximum zoom out (see more of the map)
+const ZOOM_MAX = 5;    // Maximum zoom in
+const PAN_LIMIT = 500; // Maximum distance to pan from center
+
+function updateViewBox() {
+    // Enforce zoom limits
+    const currentZoom = 1000 / viewBox.width;
+    
+    if (currentZoom < ZOOM_MIN) {
+        // Limit zoom out
+        viewBox.width = 1000 / ZOOM_MIN;
+        viewBox.height = 600 / ZOOM_MIN;
+    } else if (currentZoom > ZOOM_MAX) {
+        // Limit zoom in
+        viewBox.width = 1000 / ZOOM_MAX;
+        viewBox.height = 600 / ZOOM_MAX;
     }
+    
+    // Enforce pan limits
+    viewBox.x = Math.max(Math.min(viewBox.x, PAN_LIMIT), -PAN_LIMIT);
+    viewBox.y = Math.max(Math.min(viewBox.y, PAN_LIMIT), -PAN_LIMIT);
+    
+    svgMap.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+}
 
-    // Zoom functionality
-    svgMap.addEventListener('wheel', function(e) {
-        e.preventDefault();
-        
-        const mouseX = e.clientX - svgMap.getBoundingClientRect().left;
-        const mouseY = e.clientY - svgMap.getBoundingClientRect().top;
-        
-        const svgPoint = svgMap.createSVGPoint();
-        svgPoint.x = mouseX;
-        svgPoint.y = mouseY;
-        
-        const CTM = svgMap.getScreenCTM();
-        const svgCoords = svgPoint.matrixTransform(CTM.inverse());
-        
-        const zoomFactor = e.deltaY < 0 ? 0.8 : 1.25;
-        const newWidth = viewBox.width * zoomFactor;
-        const newHeight = viewBox.height * zoomFactor;
-        
-        viewBox.x = svgCoords.x - (svgCoords.x - viewBox.x) * zoomFactor;
-        viewBox.y = svgCoords.y - (svgCoords.y - viewBox.y) * zoomFactor;
-        viewBox.width = newWidth;
-        viewBox.height = newHeight;
-        
-        updateViewBox();
-    });
+// Zoom functionality
+svgMap.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    
+    const mouseX = e.clientX - svgMap.getBoundingClientRect().left;
+    const mouseY = e.clientY - svgMap.getBoundingClientRect().top;
+    
+    const svgPoint = svgMap.createSVGPoint();
+    svgPoint.x = mouseX;
+    svgPoint.y = mouseY;
+    
+    const CTM = svgMap.getScreenCTM();
+    const svgCoords = svgPoint.matrixTransform(CTM.inverse());
+    
+    const zoomFactor = e.deltaY < 0 ? 0.8 : 1.25;
+    const newWidth = viewBox.width * zoomFactor;
+    const newHeight = viewBox.height * zoomFactor;
+    
+    viewBox.x = svgCoords.x - (svgCoords.x - viewBox.x) * zoomFactor;
+    viewBox.y = svgCoords.y - (svgCoords.y - viewBox.y) * zoomFactor;
+    viewBox.width = newWidth;
+    viewBox.height = newHeight;
+    
+    updateViewBox();
+});
 
     // Pan functionality
     svgMap.addEventListener('mousedown', function(e) {
