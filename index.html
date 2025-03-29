@@ -3,30 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sol</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Sol Test</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 100px;
+        }
+    </style>
 </head>
 <body>
-    <div id="universe">
-        <div id="solar-system">
-            <!-- The sun -->
-            <div class="celestial-body sun" data-name="Sol">
-                <div class="body-content"></div>
-                <div class="tooltip">
-                    <h3>Sol</h3>
-                    <p>Our solar system's star, providing energy to all planets and supporting life on Earth.</p>
-                </div>
-            </div>
-            
-            <!-- Planets and other major bodies will be added here -->
-            
-        </div>
-        <div id="controls">
-            <button id="zoom-in">+</button>
-            <button id="zoom-out">-</button>
-            <button id="reset">Reset View</button>
-        </div>
-    </div>
+    <h1>Solar System Test Page</h1>
+    <p>If you can see this text, the HTML is loading correctly.</p>
+    
+    <script>
+        console.log("Inline script is running!");
+        document.body.innerHTML += "<p>JavaScript is working!</p>";
+    </script>
     
     <script src="script.js"></script>
 </body>
