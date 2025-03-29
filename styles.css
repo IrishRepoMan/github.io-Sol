@@ -163,3 +163,9 @@ body {
     transform: translateY(-50%) rotateX(75deg);
     border-radius: 50%;
 }
+
+.asteroid {
+    position: absolute;
+    border-radius: 50%;
+    background-color: #999;
+}
