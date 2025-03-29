@@ -77,35 +77,35 @@ document.addEventListener('DOMContentLoaded', function() {
     
     addBackgroundStars();
     
-    // Add asteroid belt
-    function addAsteroidBelt() {
-        const belt = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        belt.setAttribute("id", "asteroid-belt");
+ // Add asteroid belt
+function addAsteroidBelt() {
+    const belt = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    belt.setAttribute("id", "asteroid-belt");
+    
+    const centerX = 500;
+    const centerY = 300;
+    const innerRadius = 290;  // Adjusted to be between Mars and Jupiter
+    const outerRadius = 320;
+    
+    for (let i = 0; i < 400; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const distance = innerRadius + Math.random() * (outerRadius - innerRadius);
+        const x = centerX + Math.cos(angle) * distance;
+        const y = centerY + Math.sin(angle) * distance;
+        const size = Math.random() * 1.5 + 0.5;  // Smaller asteroids
         
-        const centerX = 500;
-        const centerY = 300;
-        const innerRadius = 330;
-        const outerRadius = 380;
+        const asteroid = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        asteroid.setAttribute("cx", x);
+        asteroid.setAttribute("cy", y);
+        asteroid.setAttribute("r", size);
+        asteroid.setAttribute("fill", "#aaa");
+        asteroid.setAttribute("opacity", Math.random() * 0.8 + 0.2);
         
-        for (let i = 0; i < 400; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const distance = innerRadius + Math.random() * (outerRadius - innerRadius);
-            const x = centerX + Math.cos(angle) * distance;
-            const y = centerY + Math.sin(angle) * distance;
-            const size = Math.random() * 2 + 0.5;
-            
-            const asteroid = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            asteroid.setAttribute("cx", x);
-            asteroid.setAttribute("cy", y);
-            asteroid.setAttribute("r", size);
-            asteroid.setAttribute("fill", "#aaa");
-            asteroid.setAttribute("opacity", Math.random() * 0.8 + 0.2);
-            
-            belt.appendChild(asteroid);
-        }
-        
-        svgMap.insertBefore(belt, svgMap.firstChild.nextSibling); // Insert after stars
+        belt.appendChild(asteroid);
     }
+    
+    svgMap.insertBefore(belt, svgMap.firstChild.nextSibling);
+}
     
     addAsteroidBelt();
     
