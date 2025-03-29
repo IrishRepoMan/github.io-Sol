@@ -3,33 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sol System - 2990 CE</title>
+    <title>Sol</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>The Solar System</h1>
-        <p>Human civilization spans the entire solar system with a population of 5 trillion</p>
-    </header>
-    
-    <div id="mapContainer">
-        <div id="solarMap">
-            <!-- The actual solar system map will be created with JavaScript -->
+    <div id="universe">
+        <div id="solar-system">
+            <!-- The sun -->
+            <div class="celestial-body sun" data-name="Sol">
+                <div class="body-content"></div>
+                <div class="tooltip">
+                    <h3>Sol</h3>
+                    <p>Our solar system's star, providing energy to all planets and supporting life on Earth.</p>
+                </div>
+            </div>
+            
+            <!-- Planets and other major bodies will be added here -->
+            
         </div>
-        
-        <div id="infoPanel" class="hidden">
-            <div id="closeInfo">✕</div>
-            <h2 id="celestialBodyTitle"></h2>
-            <div id="celestialBodyContent"></div>
+        <div id="controls">
+            <button id="zoom-in">+</button>
+            <button id="zoom-out">-</button>
+            <button id="reset">Reset View</button>
         </div>
-        
-        <div id="tooltip" class="hidden"></div>
     </div>
     
-    <footer>
-        <p>© 2990 Sol System Interactive Map</p>
-    </footer>
-    
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
