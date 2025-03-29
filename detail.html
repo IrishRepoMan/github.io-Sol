@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sol - Celestial Body Details</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            overflow: auto;
+            padding: 50px;
+        }
+        
+        #detail-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 30px;
+        }
+        
+        .detail-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .body-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin-right: 30px;
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">← Back to Solar System</button>
+    
+    <div id="detail-container">
+        <div class="detail-header">
+            <div class="body-image" id="body-image"></div>
+            <div>
+                <h1 id="body-name">Loading...</h1>
+                <h3 id="body-type">Celestial Body</h3>
+            </div>
+        </div>
+        
+        <div id="body-description">
+            Loading details...
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the body name from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const bodyName = urlParams.get('body');
+            
+            // For now, we'll just show the name
+            // In a real implementation, you would fetch data about this specific body
+            document.getElementById('body-name').textContent = bodyName.charAt(0).toUpperCase() + bodyName.slice(1);
+            
+            // Simulate loading detailed content - in a real implementation you'd load this from a data file
+            setTimeout(() => {
+                document.getElementById('body-description').innerHTML = `
+                    <p>This is detailed information about ${bodyName}. In your full implementation, you would load
+                    specific data for each celestial body from your database or JSON files.</p>
+                    <p>For now, this is just placeholder text to show how the detail page would work.</p>
+                    <h2>History</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget
+                    ultricies tincidunt, nisl nunc aliquam nunc, id aliquam nunc nisl eget nunc.</p>
+                    <h2>Current Status</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget
+                    ultricies tincidunt, nisl nunc aliquam nunc, id aliquam nunc nisl eget nunc.</p>
+                `;
+                
+                // Set a background for the image based on the body name
+                const bodyImage = document.getElementById('body-image');
+                
+                // This is just a placeholder - in a real implementation you'd use actual images
+                const colors = {
+                    'sol': '#fd6801',
+                    'mercury': '#a6a6a6',
+                    'venus': '#e6e600',
+                    'earth': '#3399ff',
+                    'mars': '#ff6600',
+                    'jupiter': '#ff9966',
+                    'saturn': '#ffcc99',
+                    'uranus': '#99ccff',
+                    'neptune': '#3366ff',
+                    'pluto': '#cc9966'
+                };
+                
+                bodyImage.style.backgroundColor = colors[bodyName] || '#888888';
+            }, 500);
+        });
+    </script>
+</body>
+</html>
