@@ -55,4 +55,142 @@ document.addEventListener('DOMContentLoaded', function() {
         label.textContent = body.name;
         svgMap.appendChild(label);
     }
+    
+    // Add background stars
+    function addBackgroundStars() {
+        for (let i = 0; i < 200; i++) {
+            const star = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            const x = Math.random() * 1000;
+            const y = Math.random() * 600;
+            const size = Math.random() * 1.5;
+            const opacity = Math.random() * 0.8 + 0.2;
+            
+            star.setAttribute("cx", x);
+            star.setAttribute("cy", y);
+            star.setAttribute("r", size);
+            star.setAttribute("fill", "white");
+            star.setAttribute("opacity", opacity);
+            
+            svgMap.insertBefore(star, svgMap.firstChild);
+        }
+    }
+    
+    addBackgroundStars();
+    
+    // Add asteroid belt
+    function addAsteroidBelt() {
+        const belt = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        belt.setAttribute("id", "asteroid-belt");
+        
+        const centerX = 500;
+        const centerY = 300;
+        const innerRadius = 330;
+        const outerRadius = 380;
+        
+        for (let i = 0; i < 400; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = innerRadius + Math.random() * (outerRadius - innerRadius);
+            const x = centerX + Math.cos(angle) * distance;
+            const y = centerY + Math.sin(angle) * distance;
+            const size = Math.random() * 2 + 0.5;
+            
+            const asteroid = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            asteroid.setAttribute("cx", x);
+            asteroid.setAttribute("cy", y);
+            asteroid.setAttribute("r", size);
+            asteroid.setAttribute("fill", "#aaa");
+            asteroid.setAttribute("opacity", Math.random() * 0.8 + 0.2);
+            
+            belt.appendChild(asteroid);
+        }
+        
+        svgMap.insertBefore(belt, svgMap.firstChild.nextSibling); // Insert after stars
+    }
+    
+    addAsteroidBelt();
+    
+    // Zoom and pan functionality
+    let currentScale = 1;
+    let isPanning = false;
+    let startPoint = { x: 0, y: 0 };
+    let viewBox = { x: 0, y: 0, width: 1000, height: 600 };
+
+    function updateViewBox() {
+        svgMap.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+    }
+
+    // Zoom functionality
+    svgMap.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        
+        const mouseX = e.clientX - svgMap.getBoundingClientRect().left;
+        const mouseY = e.clientY - svgMap.getBoundingClientRect().top;
+        
+        const svgPoint = svgMap.createSVGPoint();
+        svgPoint.x = mouseX;
+        svgPoint.y = mouseY;
+        
+        const CTM = svgMap.getScreenCTM();
+        const svgCoords = svgPoint.matrixTransform(CTM.inverse());
+        
+        const zoomFactor = e.deltaY < 0 ? 0.8 : 1.25;
+        const newWidth = viewBox.width * zoomFactor;
+        const newHeight = viewBox.height * zoomFactor;
+        
+        viewBox.x = svgCoords.x - (svgCoords.x - viewBox.x) * zoomFactor;
+        viewBox.y = svgCoords.y - (svgCoords.y - viewBox.y) * zoomFactor;
+        viewBox.width = newWidth;
+        viewBox.height = newHeight;
+        
+        updateViewBox();
+    });
+
+    // Pan functionality
+    svgMap.addEventListener('mousedown', function(e) {
+        if (e.button === 0) { // Left mouse button
+            isPanning = true;
+            startPoint = { x: e.clientX, y: e.clientY };
+            svgMap.style.cursor = 'grabbing';
+        }
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (!isPanning) return;
+        
+        const dx = (e.clientX - startPoint.x) * viewBox.width / svgMap.clientWidth;
+        const dy = (e.clientY - startPoint.y) * viewBox.height / svgMap.clientHeight;
+        
+        viewBox.x -= dx;
+        viewBox.y -= dy;
+        
+        updateViewBox();
+        
+        startPoint = { x: e.clientX, y: e.clientY };
+    });
+
+    document.addEventListener('mouseup', function() {
+        isPanning = false;
+        svgMap.style.cursor = 'default';
+    });
+
+    // Add reset view button
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset View';
+    resetButton.style.position = 'absolute';
+    resetButton.style.top = '10px';
+    resetButton.style.right = '10px';
+    resetButton.style.zIndex = '100';
+    resetButton.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+    resetButton.style.color = 'white';
+    resetButton.style.border = 'none';
+    resetButton.style.padding = '5px 10px';
+    resetButton.style.borderRadius = '5px';
+    resetButton.style.cursor = 'pointer';
+
+    resetButton.addEventListener('click', function() {
+        viewBox = { x: 0, y: 0, width: 1000, height: 600 };
+        updateViewBox();
+    });
+
+    document.querySelector('#map-container').appendChild(resetButton);
 });
