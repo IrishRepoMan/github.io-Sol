@@ -46,36 +46,74 @@ document.addEventListener('DOMContentLoaded', function() {
         
         svgMap.appendChild(element);
         
-        // Add text label
-        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        label.setAttribute("x", body.position.x);
-        label.setAttribute("y", body.position.y + body.position.radius + 15);
-        label.setAttribute("text-anchor", "middle");
-        label.setAttribute("class", "body-label");
-        label.textContent = body.name;
-        svgMap.appendChild(label);
+     // label
+const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+label.setAttribute("x", body.position.x);
+label.setAttribute("y", body.position.y + body.position.radius + 12);  // Adjusted
+label.setAttribute("font-size", "10");  // Making labels a bit smaller
+label.setAttribute("text-anchor", "middle");
+label.setAttribute("class", "body-label");
+label.textContent = body.name;
+svgMap.appendChild(label);
     }
     
-    // Add background stars
-    function addBackgroundStars() {
-        for (let i = 0; i < 200; i++) {
-            const star = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-            const x = Math.random() * 1000;
-            const y = Math.random() * 600;
-            const size = Math.random() * 1.5;
-            const opacity = Math.random() * 0.8 + 0.2;
-            
-            star.setAttribute("cx", x);
-            star.setAttribute("cy", y);
-            star.setAttribute("r", size);
-            star.setAttribute("fill", "white");
-            star.setAttribute("opacity", opacity);
-            
-            svgMap.insertBefore(star, svgMap.firstChild);
-        }
+// Add a title to the map
+function addTitle() {
+    const title = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    title.setAttribute("x", "500");
+    title.setAttribute("y", "30");
+    title.setAttribute("text-anchor", "middle");
+    title.setAttribute("font-size", "20");
+    title.setAttribute("fill", "white");
+    title.setAttribute("font-weight", "bold");
+    title.textContent = "Sol";
+    svgMap.appendChild(title);
+}
+
+// Improved background stars function
+function addBackgroundStars() {
+    // Create a group for stars
+    const starsGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    starsGroup.setAttribute("id", "background-stars");
+    
+    // Add different sizes of stars
+    const starCounts = { small: 400, medium: 100, large: 30 };
+    
+    // Add small stars
+    for (let i = 0; i < starCounts.small; i++) {
+        addStar(starsGroup, 0.5, 0.8);
     }
     
-    addBackgroundStars();
+    // Add medium stars
+    for (let i = 0; i < starCounts.medium; i++) {
+        addStar(starsGroup, 1, 0.9);
+    }
+    
+    // Add large stars
+    for (let i = 0; i < starCounts.large; i++) {
+        addStar(starsGroup, 1.5, 1);
+    }
+    
+    svgMap.insertBefore(starsGroup, svgMap.firstChild);
+}
+
+function addStar(group, size, opacity) {
+    const star = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    const x = Math.random() * 1000;
+    const y = Math.random() * 600;
+    
+    star.setAttribute("cx", x);
+    star.setAttribute("cy", y);
+    star.setAttribute("r", size);
+    star.setAttribute("fill", "white");
+    star.setAttribute("opacity", opacity * Math.random() * 0.5 + 0.5);
+    
+    group.appendChild(star);
+}
+
+// Call these new functions in your initialization
+addTitle();
+addBackgroundStars();
     
  // Add asteroid belt
 function addAsteroidBelt() {
@@ -216,3 +254,48 @@ svgMap.addEventListener('wheel', function(e) {
 
     document.querySelector('#map-container').appendChild(resetButton);
 });
+
+// Add after all your existing code in main.js
+function addControls() {
+    // Create container
+    const controls = document.createElement('div');
+    controls.style.position = 'absolute';
+    controls.style.top = '10px';
+    controls.style.right = '10px';
+    controls.style.zIndex = '100';
+    controls.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    controls.style.padding = '10px';
+    controls.style.borderRadius = '5px';
+    controls.style.display = 'flex';
+    controls.style.flexDirection = 'column';
+    controls.style.gap = '5px';
+    
+    // Reset view button
+    const resetButton = document.createElement('button');
+    resetButton.textContent = 'Reset View';
+    resetButton.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+    resetButton.style.color = 'white';
+    resetButton.style.border = 'none';
+    resetButton.style.padding = '5px 10px';
+    resetButton.style.borderRadius = '5px';
+    resetButton.style.cursor = 'pointer';
+    
+    resetButton.addEventListener('click', function() {
+        viewBox = { x: 0, y: 0, width: 1000, height: 600 };
+        updateViewBox();
+    });
+    
+    // Instructions
+    const instructions = document.createElement('div');
+    instructions.style.color = 'white';
+    instructions.style.fontSize = '10px';
+    instructions.style.marginTop = '5px';
+    instructions.innerHTML = 'Scroll to zoom<br>Drag to pan<br>Click for details';
+    
+    controls.appendChild(resetButton);
+    controls.appendChild(instructions);
+    
+    document.querySelector('#map-container').appendChild(controls);
+}
+
+addControls();
