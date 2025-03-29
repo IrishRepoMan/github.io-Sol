@@ -12,150 +12,150 @@ document.addEventListener('DOMContentLoaded', function() {
     updateTransform();
     
     const celestialBodies = [
-    {
-        name: "Sol",
-        diameter: 200,
-        position: { x: 2500, y: 2500 },
-        color: "#fd6801",
-        description: "Our solar system's star, providing energy to all planets and supporting life on Earth.",
-        orbitSpeed: 0,
-    },
-    {
-        name: "Mercury",
-        diameter: 20,
-        orbitRadius: 300,
-        orbitSpeed: 4.1,
-        color: "#a6a6a6",
-        description: "The smallest and innermost planet, known for extreme environment technologies and specialized mining operations."
-    },
-    {
-        name: "Venus",
-        diameter: 38,
-        orbitRadius: 400,
-        orbitSpeed: 1.6,
-        color: "#e6e600",
-        description: "Earth's toxic twin with a runaway greenhouse effect, now a major mining operation under Terra's authority."
-    },
-    {
-        name: "Earth",
-        diameter: 40,
-        orbitRadius: 500,
-        orbitSpeed: 1,
-        color: "#3399ff",
-        description: "Humanity's birthplace, now partially rewilded and serving as a biological repository with most population in orbital habitats."
-    },
-    {
-        name: "Luna",
-        diameter: 12,
-        orbitRadius: 530,
-        orbitSpeed: 1,
-        parentOrbit: "Earth",
-        color: "#cccccc",
-        description: "Earth's moon, home to early human colonization efforts and historical sites of significance."
-    },
-    {
-        name: "Mars",
-        diameter: 30,
-        orbitRadius: 600,
-        orbitSpeed: 0.53,
-        color: "#ff6600",
-        description: "The solar system's breadbasket with terraformed agricultural domes producing food for trillions of humans."
-    },
-    {
-        name: "Jupiter",
-        diameter: 120,
-        orbitRadius: 1000,
-        orbitSpeed: 0.084,
-        color: "#ffcc99",
-        description: "A gas giant and economic superpower controlling energy resources and advanced technologies."
-    },
-    {
-        name: "Io",
-        diameter: 10,
-        orbitRadius: 1070,
-        orbitSpeed: 0.084,
-        parentOrbit: "Jupiter",
-        color: "#ffff00",
-        description: "Jupiter's volcanically active moon with specialized mining operations."
-    },
-    {
-        name: "Europa",
-        diameter: 10,
-        orbitRadius: 1090,
-        orbitSpeed: 0.084,
-        parentOrbit: "Jupiter",
-        color: "#ffffff",
-        description: "Jupiter's ice-covered moon with subsurface ocean, hosting scientific outposts."
-    },
-    {
-        name: "Ganymede",
-        diameter: 15,
-        orbitRadius: 1120,
-        orbitSpeed: 0.084,
-        parentOrbit: "Jupiter",
-        color: "#cccccc",
-        description: "Jupiter's largest moon and an important administrative center for Jovian operations."
-    },
-    {
-        name: "Callisto",
-        diameter: 14,
-        orbitRadius: 1150,
-        orbitSpeed: 0.084,
-        parentOrbit: "Jupiter",
-        color: "#999999",
-        description: "Jupiter's outermost large moon with significant habitat development."
-    },
-    {
-        name: "Saturn",
-        diameter: 100,
-        orbitRadius: 1400,
-        orbitSpeed: 0.034,
-        color: "#ffe6b3",
-        description: "Ringed gas giant under the control of the Outer System Empire, with strategic resource operations."
-    },
-    {
-        name: "Titan",
-        diameter: 16,
-        orbitRadius: 1460,
-        orbitSpeed: 0.034,
-        parentOrbit: "Saturn",
-        color: "#e6b800",
-        description: "Saturn's largest moon and the administrative center of the Outer System Empire."
-    },
-    {
-        name: "Uranus",
-        diameter: 70,
-        orbitRadius: 1800,
-        orbitSpeed: 0.012,
-        color: "#77ccff",
-        description: "Ice giant under Outer System Empire control with specialized gas extraction operations."
-    },
-    {
-        name: "Neptune",
-        diameter: 68,
-        orbitRadius: 2100,
-        orbitSpeed: 0.006,
-        color: "#3366ff",
-        description: "The outermost gas giant controlled by the Outer System Empire, with deuterium and tritium extraction facilities."
-    },
-    {
-        name: "Triton",
-        diameter: 12,
-        orbitRadius: 2140,
-        orbitSpeed: 0.006,
-        parentOrbit: "Neptune",
-        color: "#ccccff",
-        description: "Neptune's largest moon with significant imperial presence and specialized manufacturing."
-    },
-    {
-        name: "Pluto",
-        diameter: 16,
-        orbitRadius: 2300,
-        orbitSpeed: 0.004,
-        color: "#ccb399",
-        description: "Dwarf planet serving as humanity's forward scientific observatory, accessible to all factions for research."
-    }
-];
+        {
+            name: "Sol",
+            diameter: 200,
+            position: { x: 2500, y: 2500 },
+            color: "#fd6801",
+            description: "Our solar system's star, providing energy to all planets and supporting life on Earth.",
+            orbitSpeed: 0,
+        },
+        {
+            name: "Mercury",
+            diameter: 20,
+            orbitRadius: 300,
+            orbitSpeed: 4.1,
+            color: "#a6a6a6",
+            description: "The smallest and innermost planet, known for extreme environment technologies and specialized mining operations."
+        },
+        {
+            name: "Venus",
+            diameter: 38,
+            orbitRadius: 400,
+            orbitSpeed: 1.6,
+            color: "#e6e600",
+            description: "Earth's toxic twin with a runaway greenhouse effect, now a major mining operation under Terra's authority."
+        },
+        {
+            name: "Earth",
+            diameter: 40,
+            orbitRadius: 500,
+            orbitSpeed: 1,
+            color: "#3399ff",
+            description: "Humanity's birthplace, now partially rewilded and serving as a biological repository with most population in orbital habitats."
+        },
+        {
+            name: "Luna",
+            diameter: 12,
+            orbitRadius: 530,
+            orbitSpeed: 1,
+            parentOrbit: "Earth",
+            color: "#cccccc",
+            description: "Earth's moon, home to early human colonization efforts and historical sites of significance."
+        },
+        {
+            name: "Mars",
+            diameter: 30,
+            orbitRadius: 600,
+            orbitSpeed: 0.53,
+            color: "#ff6600",
+            description: "The solar system's breadbasket with terraformed agricultural domes producing food for trillions of humans."
+        },
+        {
+            name: "Jupiter",
+            diameter: 120,
+            orbitRadius: 1000,
+            orbitSpeed: 0.084,
+            color: "#ffcc99",
+            description: "A gas giant and economic superpower controlling energy resources and advanced technologies."
+        },
+        {
+            name: "Io",
+            diameter: 10,
+            orbitRadius: 1070,
+            orbitSpeed: 0.084,
+            parentOrbit: "Jupiter",
+            color: "#ffff00",
+            description: "Jupiter's volcanically active moon with specialized mining operations."
+        },
+        {
+            name: "Europa",
+            diameter: 10,
+            orbitRadius: 1090,
+            orbitSpeed: 0.084,
+            parentOrbit: "Jupiter",
+            color: "#ffffff",
+            description: "Jupiter's ice-covered moon with subsurface ocean, hosting scientific outposts."
+        },
+        {
+            name: "Ganymede",
+            diameter: 15,
+            orbitRadius: 1120,
+            orbitSpeed: 0.084,
+            parentOrbit: "Jupiter",
+            color: "#cccccc",
+            description: "Jupiter's largest moon and an important administrative center for Jovian operations."
+        },
+        {
+            name: "Callisto",
+            diameter: 14,
+            orbitRadius: 1150,
+            orbitSpeed: 0.084,
+            parentOrbit: "Jupiter",
+            color: "#999999",
+            description: "Jupiter's outermost large moon with significant habitat development."
+        },
+        {
+            name: "Saturn",
+            diameter: 100,
+            orbitRadius: 1400,
+            orbitSpeed: 0.034,
+            color: "#ffe6b3",
+            description: "Ringed gas giant under the control of the Outer System Empire, with strategic resource operations."
+        },
+        {
+            name: "Titan",
+            diameter: 16,
+            orbitRadius: 1460,
+            orbitSpeed: 0.034,
+            parentOrbit: "Saturn",
+            color: "#e6b800",
+            description: "Saturn's largest moon and the administrative center of the Outer System Empire."
+        },
+        {
+            name: "Uranus",
+            diameter: 70,
+            orbitRadius: 1800,
+            orbitSpeed: 0.012,
+            color: "#77ccff",
+            description: "Ice giant under Outer System Empire control with specialized gas extraction operations."
+        },
+        {
+            name: "Neptune",
+            diameter: 68,
+            orbitRadius: 2100,
+            orbitSpeed: 0.006,
+            color: "#3366ff",
+            description: "The outermost gas giant controlled by the Outer System Empire, with deuterium and tritium extraction facilities."
+        },
+        {
+            name: "Triton",
+            diameter: 12,
+            orbitRadius: 2140,
+            orbitSpeed: 0.006,
+            parentOrbit: "Neptune",
+            color: "#ccccff",
+            description: "Neptune's largest moon with significant imperial presence and specialized manufacturing."
+        },
+        {
+            name: "Pluto",
+            diameter: 16,
+            orbitRadius: 2300,
+            orbitSpeed: 0.004,
+            color: "#ccb399",
+            description: "Dwarf planet serving as humanity's forward scientific observatory, accessible to all factions for research."
+        }
+    ];
     
     // Create celestial bodies
     function createCelestialBodies() {
@@ -187,7 +187,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Create body content (the visible planet)
             const bodyContent = document.createElement('div');
             bodyContent.className = 'body-content';
-            bodyContent.style.backgroundColor = body.color;
             
             // Create tooltip
             const tooltip = document.createElement('div');
@@ -218,91 +217,94 @@ document.addEventListener('DOMContentLoaded', function() {
             element.dataset.orbitSpeed = body.orbitSpeed;
             element.dataset.orbitRadius = body.orbitRadius;
         });
+
+        // Create asteroid belt
+        createAsteroidBelt();
+    }
+
     // Create asteroid belt
-function createAsteroidBelt() {
-    const beltContainer = document.createElement('div');
-    beltContainer.className = 'asteroid-belt';
-    
-    // Create individual asteroids
-    const asteroidCount = 500;
-    const minRadius = 700;
-    const maxRadius = 850;
-    
-    for (let i = 0; i < asteroidCount; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const radius = minRadius + Math.random() * (maxRadius - minRadius);
-        const size = 2 + Math.random() * 4;
+    function createAsteroidBelt() {
+        const beltContainer = document.createElement('div');
+        beltContainer.className = 'asteroid-belt';
         
-        const x = 2500 + Math.cos(angle) * radius - size/2;
-        const y = 2500 + Math.sin(angle) * radius - size/2;
+        // Create individual asteroids
+        const asteroidCount = 500;
+        const minRadius = 700;
+        const maxRadius = 850;
         
-        const asteroid = document.createElement('div');
-        asteroid.className = 'asteroid';
-        asteroid.style.width = `${size}px`;
-        asteroid.style.height = `${size}px`;
-        asteroid.style.left = `${x}px`;
-        asteroid.style.top = `${y}px`;
-        asteroid.style.backgroundColor = `rgba(${100 + Math.random() * 100}, ${100 + Math.random() * 100}, ${100 + Math.random() * 100}, 0.8)`;
+        for (let i = 0; i < asteroidCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = minRadius + Math.random() * (maxRadius - minRadius);
+            const size = 2 + Math.random() * 4;
+            
+            const x = 2500 + Math.cos(angle) * radius - size/2;
+            const y = 2500 + Math.sin(angle) * radius - size/2;
+            
+            const asteroid = document.createElement('div');
+            asteroid.className = 'asteroid';
+            asteroid.style.width = `${size}px`;
+            asteroid.style.height = `${size}px`;
+            asteroid.style.left = `${x}px`;
+            asteroid.style.top = `${y}px`;
+            asteroid.style.backgroundColor = `rgba(${100 + Math.random() * 100}, ${100 + Math.random() * 100}, ${100 + Math.random() * 100}, 0.8)`;
+            
+            // Store orbital data for animation
+            asteroid.dataset.angle = angle;
+            asteroid.dataset.radius = radius;
+            asteroid.dataset.orbitSpeed = 0.1 + Math.random() * 0.2;
+            
+            beltContainer.appendChild(asteroid);
+        }
         
-        // Store orbital data for animation
-        asteroid.dataset.angle = angle;
-        asteroid.dataset.radius = radius;
-        asteroid.dataset.orbitSpeed = 0.1 + Math.random() * 0.2;
-        
-        beltContainer.appendChild(asteroid);
+        solarSystem.appendChild(beltContainer);
     }
     
-    solarSystem.appendChild(beltContainer);
-}
-
-createAsteroidBelt();
-    
-// Update positions for animation
-function animateCelestialBodies() {
-    // Animate celestial bodies
-    document.querySelectorAll('.celestial-body').forEach(element => {
-        if (element.getAttribute('data-name') === 'Sol') return; // Sun doesn't move
+    // Update positions for animation
+    function animateCelestialBodies() {
+        // Animate celestial bodies
+        document.querySelectorAll('.celestial-body').forEach(element => {
+            if (element.getAttribute('data-name') === 'Sol') return; // Sun doesn't move
+            
+            let angle = parseFloat(element.dataset.angle);
+            const speed = parseFloat(element.dataset.orbitSpeed);
+            const radius = parseFloat(element.dataset.orbitRadius);
+            
+            // Update angle
+            angle += (0.001 * speed);
+            element.dataset.angle = angle;
+            
+            // Calculate new position
+            const diameter = parseInt(element.style.width);
+            const x = 2500 + Math.cos(angle) * radius - diameter/2;
+            const y = 2500 + Math.sin(angle) * radius - diameter/2;
+            
+            // Update element position
+            element.style.left = `${x}px`;
+            element.style.top = `${y}px`;
+        });
         
-        let angle = parseFloat(element.dataset.angle);
-        const speed = parseFloat(element.dataset.orbitSpeed);
-        const radius = parseFloat(element.dataset.orbitRadius);
+        // Animate asteroids
+        document.querySelectorAll('.asteroid').forEach(asteroid => {
+            let angle = parseFloat(asteroid.dataset.angle);
+            const speed = parseFloat(asteroid.dataset.orbitSpeed);
+            const radius = parseFloat(asteroid.dataset.radius);
+            
+            // Update angle
+            angle += (0.001 * speed);
+            asteroid.dataset.angle = angle;
+            
+            // Calculate new position
+            const size = parseInt(asteroid.style.width);
+            const x = 2500 + Math.cos(angle) * radius - size/2;
+            const y = 2500 + Math.sin(angle) * radius - size/2;
+            
+            // Update element position
+            asteroid.style.left = `${x}px`;
+            asteroid.style.top = `${y}px`;
+        });
         
-        // Update angle
-        angle += (0.001 * speed);
-        element.dataset.angle = angle;
-        
-        // Calculate new position
-        const diameter = parseInt(element.style.width);
-        const x = 2500 + Math.cos(angle) * radius - diameter/2;
-        const y = 2500 + Math.sin(angle) * radius - diameter/2;
-        
-        // Update element position
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`;
-    });
-    
-    // Animate asteroids
-    document.querySelectorAll('.asteroid').forEach(asteroid => {
-        let angle = parseFloat(asteroid.dataset.angle);
-        const speed = parseFloat(asteroid.dataset.orbitSpeed);
-        const radius = parseFloat(asteroid.dataset.radius);
-        
-        // Update angle
-        angle += (0.001 * speed);
-        asteroid.dataset.angle = angle;
-        
-        // Calculate new position
-        const size = parseInt(asteroid.style.width);
-        const x = 2500 + Math.cos(angle) * radius - size/2;
-        const y = 2500 + Math.sin(angle) * radius - size/2;
-        
-        // Update element position
-        asteroid.style.left = `${x}px`;
-        asteroid.style.top = `${y}px`;
-    });
-    
-    requestAnimationFrame(animateCelestialBodies);
-}
+        requestAnimationFrame(animateCelestialBodies);
+    }
     
     // Pan and zoom functionality
     function updateTransform() {
@@ -332,6 +334,7 @@ function animateCelestialBodies() {
         isDragging = true;
         startDragX = e.clientX - currentX;
         startDragY = e.clientY - currentY;
+        e.preventDefault(); // Prevent text selection during drag
     });
     
     document.addEventListener('mousemove', function(e) {
@@ -351,6 +354,21 @@ function animateCelestialBodies() {
     document.addEventListener('mouseup', function() {
         isDragging = false;
     });
+    
+    // Mouse wheel for zooming
+    document.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        
+        if (e.deltaY < 0) {
+            // Zoom in
+            currentZoom = Math.min(currentZoom * 1.1, maxZoom);
+        } else {
+            // Zoom out
+            currentZoom = Math.max(currentZoom * 0.9, minZoom);
+        }
+        
+        updateTransform();
+    }, { passive: false });
     
     // Initialize the solar system
     createCelestialBodies();
