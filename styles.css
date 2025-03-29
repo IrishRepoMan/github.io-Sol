@@ -101,4 +101,65 @@ body {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* We'll add more specific planet styling later */
+/* Orbit styling */
+.orbit {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Specific planet styling */
+.mercury .body-content {
+    background: linear-gradient(30deg, #6e6e6e, #a6a6a6, #d4d4d4);
+}
+
+.venus .body-content {
+    background: linear-gradient(30deg, #a57c1b, #e6e600, #ffffcc);
+}
+
+.earth .body-content {
+    background: linear-gradient(30deg, #1a5599, #3399ff, #66ccff);
+}
+
+.mars .body-content {
+    background: linear-gradient(30deg, #992900, #ff6600, #ff9966);
+}
+
+.jupiter .body-content {
+    background: linear-gradient(30deg, #a67c52, #d4a876, #e6c699);
+    background-image: repeating-linear-gradient(30deg, transparent, transparent 20px, rgba(150, 90, 60, 0.2) 20px, rgba(150, 90, 60, 0.2) 40px);
+}
+
+.saturn .body-content {
+    background: linear-gradient(30deg, #b39766, #d4c099, #e6d4b3);
+}
+
+.uranus .body-content {
+    background: linear-gradient(30deg, #5dacee, #77ccff, #aaddff);
+}
+
+.neptune .body-content {
+    background: linear-gradient(30deg, #3355bb, #5577dd, #7799ff);
+}
+
+.pluto .body-content {
+    background: linear-gradient(30deg, #9a7c5c, #b39980, #ccb399);
+}
+
+/* Add ring for Saturn */
+.saturn {
+    position: relative;
+}
+
+.saturn::after {
+    content: '';
+    position: absolute;
+    width: 160%;
+    height: 20px;
+    background: linear-gradient(to right, rgba(210, 180, 140, 0), rgba(210, 180, 140, 0.7), rgba(210, 180, 140, 0));
+    top: 50%;
+    left: -30%;
+    transform: translateY(-50%) rotateX(75deg);
+    border-radius: 50%;
+}
