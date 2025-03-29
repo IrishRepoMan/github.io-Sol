@@ -374,3 +374,5 @@ document.addEventListener('DOMContentLoaded', function() {
     createCelestialBodies();
     animateCelestialBodies();
 });
+
+console.log("Script is loading!");
