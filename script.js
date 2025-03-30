@@ -14,19 +14,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Apply initial zoom
     function updateTransform() {
         solarSystem.style.transform = `translate(calc(${currentX}px - 50%), calc(${currentY}px - 50%)) scale(${currentZoom})`;
-    console.log("Applied transform:", solarSystem.style.transform);
+        console.log("Applied transform:", solarSystem.style.transform);
 
         // Make sure elements are visible
-document.getElementById('solar-system').style.visibility = 'visible';
-document.getElementById('solar-system').style.opacity = '1';
-document.getElementById('universe').style.backgroundColor = '#000';
+        document.getElementById('solar-system').style.visibility = 'visible';
+        document.getElementById('solar-system').style.opacity = '1';
+        document.getElementById('universe').style.backgroundColor = '#000';
 
-// Debug element visibility
-console.log("Solar system visibility:", 
-    window.getComputedStyle(solarSystem).getPropertyValue('visibility'),
-    "Opacity:", 
-    window.getComputedStyle(solarSystem).getPropertyValue('opacity'));
-}
+        // Update zoom display
+        updateZoomDisplay();
+    }
+    
+    // Function to update zoom level display
+    function updateZoomDisplay() {
+        const zoomLevelDisplay = document.getElementById('zoom-level');
+        if (zoomLevelDisplay) {
+            zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+        }
+    }
     
     updateTransform();
     
@@ -35,7 +40,7 @@ console.log("Solar system visibility:",
         {
             name: "Sol",
             diameter: 200,
-            position: { x: 2500, y: 2500 },
+            position: { x: 0, y: 0 },  // Center of the solar system
             color: "#fd6801",
             description: "Our solar system's star, providing energy to all planets and supporting life on Earth.",
             orbitSpeed: 0,
@@ -312,6 +317,12 @@ console.log("Solar system visibility:",
         }
     ];
     
+    // Calculate the center of the solar system
+    const systemCenter = {
+        x: 2500,
+        y: 2500
+    };
+    
     // Create celestial bodies
     function createCelestialBodies() {
         console.log("Creating celestial bodies...");
@@ -325,8 +336,9 @@ console.log("Solar system visibility:",
                 const sunElement = document.querySelector('.sun');
                 sunElement.style.width = `${body.diameter}px`;
                 sunElement.style.height = `${body.diameter}px`;
-                sunElement.style.left = `${body.position.x - body.diameter/2}px`;
-                sunElement.style.top = `${body.position.y - body.diameter/2}px`;
+                // Position at the center of the solar system
+                sunElement.style.left = `${systemCenter.x - body.diameter/2}px`;
+                sunElement.style.top = `${systemCenter.y - body.diameter/2}px`;
                 sunElement.dataset.bodyType = body.type;
                 console.log("Sun positioned at:", sunElement.style.left, sunElement.style.top);
                 return;
@@ -334,8 +346,8 @@ console.log("Solar system visibility:",
             
             // Calculate initial position based on orbit
             const angle = Math.random() * Math.PI * 2; // Random starting position
-            const x = 2500 + Math.cos(angle) * body.orbitRadius - body.diameter/2;
-            const y = 2500 + Math.sin(angle) * body.orbitRadius - body.diameter/2;
+            const x = systemCenter.x + Math.cos(angle) * body.orbitRadius;
+            const y = systemCenter.y + Math.sin(angle) * body.orbitRadius;
             
             // Create the HTML element
             const element = document.createElement('div');
@@ -344,8 +356,8 @@ console.log("Solar system visibility:",
             element.setAttribute('data-body-type', body.type);
             element.style.width = `${body.diameter}px`;
             element.style.height = `${body.diameter}px`;
-            element.style.left = `${x}px`;
-            element.style.top = `${y}px`;
+            element.style.left = `${x - body.diameter/2}px`;
+            element.style.top = `${y - body.diameter/2}px`;
             element.style.zIndex = 50; // Higher than orbit lines but lower than tooltips
             
             // Create body content (the visible planet)
@@ -362,8 +374,8 @@ console.log("Solar system visibility:",
             orbit.className = 'orbit';
             orbit.style.width = `${body.orbitRadius * 2}px`;
             orbit.style.height = `${body.orbitRadius * 2}px`;
-            orbit.style.left = `${2500 - body.orbitRadius}px`;
-            orbit.style.top = `${2500 - body.orbitRadius}px`;
+            orbit.style.left = `${systemCenter.x - body.orbitRadius}px`;
+            orbit.style.top = `${systemCenter.y - body.orbitRadius}px`;
             orbit.style.borderColor = 'rgba(255, 255, 255, 0.3)'; // More visible orbit line
             
             // Apply orbit inclination
@@ -398,8 +410,6 @@ console.log("Solar system visibility:",
             element.dataset.angle = angle;
             element.dataset.orbitSpeed = body.orbitSpeed;
             element.dataset.orbitRadius = body.orbitRadius;
-            element.dataset.parentBody = body.parentBody || null;
-            element.dataset.inclination = body.inclination || 0;
             
             console.log(`Created ${body.name} at position:`, x, y);
         });
@@ -418,14 +428,23 @@ console.log("Solar system visibility:",
             // Calculate initial position based on orbit around parent
             const angle = Math.random() * Math.PI * 2; // Random starting position
             
-            // Create the HTML element
+            // Get parent's dimensions
+            const parentDiameter = parseFloat(parentElement.style.width);
+            
+            // Create the HTML element for the moon
             const element = document.createElement('div');
-            element.className = `celestial-body ${body.name.toLowerCase()}`;
+            element.className = `celestial-body moon ${body.name.toLowerCase()}`;
             element.setAttribute('data-name', body.name);
             element.setAttribute('data-body-type', body.type);
             element.style.width = `${body.diameter}px`;
             element.style.height = `${body.diameter}px`;
             element.style.zIndex = 60; // Higher than planets
+
+            // Compute initial position
+            const moonX = body.orbitRadius * Math.cos(angle);
+            const moonY = body.orbitRadius * Math.sin(angle);
+            element.style.left = `${(parentDiameter - body.diameter) / 2 + moonX}px`;
+            element.style.top = `${(parentDiameter - body.diameter) / 2 + moonY}px`;
             
             // Create body content (the visible moon)
             const bodyContent = document.createElement('div');
@@ -441,8 +460,8 @@ console.log("Solar system visibility:",
             orbit.className = 'moon-orbit';
             orbit.style.width = `${body.orbitRadius * 2}px`;
             orbit.style.height = `${body.orbitRadius * 2}px`;
-            orbit.style.left = `${(parentElement.offsetWidth - body.orbitRadius * 2) / 2}px`;
-            orbit.style.top = `${(parentElement.offsetHeight - body.orbitRadius * 2) / 2}px`;
+            orbit.style.left = `${(parentDiameter - body.orbitRadius * 2) / 2}px`;
+            orbit.style.top = `${(parentDiameter - body.orbitRadius * 2) / 2}px`;
             orbit.style.borderColor = 'rgba(255, 255, 255, 0.25)'; // Slightly visible orbit line
             
             // Apply orbit inclination
@@ -467,9 +486,8 @@ console.log("Solar system visibility:",
             element.dataset.orbitSpeed = body.orbitSpeed;
             element.dataset.orbitRadius = body.orbitRadius;
             element.dataset.parentBody = body.parentBody;
-            element.dataset.inclination = body.inclination || 0;
             
-            console.log(`Created moon ${body.name} orbiting ${body.parentBody}`);
+            console.log(`Created moon ${body.name} orbiting ${body.parentBody} at relative position:`, moonX, moonY);
         });
         
         // Create asteroid belt
@@ -493,15 +511,15 @@ console.log("Solar system visibility:",
             const radius = minRadius + Math.random() * (maxRadius - minRadius);
             const size = 1.5 + Math.random() * 3.5;
             
-            const x = 2500 + Math.cos(angle) * radius - size/2;
-            const y = 2500 + Math.sin(angle) * radius - size/2;
+            const x = systemCenter.x + Math.cos(angle) * radius;
+            const y = systemCenter.y + Math.sin(angle) * radius;
             
             const asteroid = document.createElement('div');
             asteroid.className = 'asteroid';
             asteroid.style.width = `${size}px`;
             asteroid.style.height = `${size}px`;
-            asteroid.style.left = `${x}px`;
-            asteroid.style.top = `${y}px`;
+            asteroid.style.left = `${x - size/2}px`;
+            asteroid.style.top = `${y - size/2}px`;
             
             // Brighter, more visible asteroids
             const brightness = 150 + Math.floor(Math.random() * 105);
@@ -527,9 +545,7 @@ console.log("Solar system visibility:",
         lastTime = timestamp;
         
         // Animate planets
-        document.querySelectorAll('.celestial-body').forEach(element => {
-            // Skip moons as they'll be positioned relative to their planets
-            if (element.dataset.parentBody && element.dataset.bodyType === 'moon') return;
+        document.querySelectorAll('.celestial-body:not(.moon)').forEach(element => {
             if (element.getAttribute('data-name') === 'Sol') return; // Sun doesn't move
             
             let angle = parseFloat(element.dataset.angle || 0);
@@ -542,23 +558,17 @@ console.log("Solar system visibility:",
             element.dataset.angle = angle;
             
             // Calculate new position
-            const diameter = parseInt(element.style.width);
-            const x = 2500 + Math.cos(angle) * radius - diameter/2;
-            const y = 2500 + Math.sin(angle) * radius - diameter/2;
+            const diameter = parseFloat(element.style.width);
+            const x = systemCenter.x + Math.cos(angle) * radius;
+            const y = systemCenter.y + Math.sin(angle) * radius;
             
             // Update element position
-            element.style.left = `${x}px`;
-            element.style.top = `${y}px`;
+            element.style.left = `${x - diameter/2}px`;
+            element.style.top = `${y - diameter/2}px`;
         });
         
-        // Second pass - animate moons around their planets
-        document.querySelectorAll('.celestial-body[data-body-type="moon"]').forEach(moon => {
-            const parentName = moon.dataset.parentBody;
-            if (!parentName) return;
-            
-            const parentElement = document.querySelector(`.${parentName.toLowerCase()}`);
-            if (!parentElement) return;
-            
+        // Animate moons around their planets
+        document.querySelectorAll('.celestial-body.moon').forEach(moon => {
             let angle = parseFloat(moon.dataset.angle || 0);
             const speed = parseFloat(moon.dataset.orbitSpeed || 0);
             const radius = parseFloat(moon.dataset.orbitRadius || 0);
@@ -569,15 +579,18 @@ console.log("Solar system visibility:",
             moon.dataset.angle = angle;
             
             // Calculate new position relative to parent planet
-            const diameter = parseInt(moon.style.width);
-            const parentDiameter = parseInt(parentElement.style.width);
+            const parentElement = moon.parentElement;
+            if (!parentElement) return;
             
-            const x = parentDiameter/2 + Math.cos(angle) * radius - diameter/2;
-            const y = parentDiameter/2 + Math.sin(angle) * radius - diameter/2;
+            const diameter = parseFloat(moon.style.width);
+            const parentDiameter = parseFloat(parentElement.style.width);
+            
+            const moonX = radius * Math.cos(angle);
+            const moonY = radius * Math.sin(angle);
             
             // Update element position
-            moon.style.left = `${x}px`;
-            moon.style.top = `${y}px`;
+            moon.style.left = `${(parentDiameter - diameter) / 2 + moonX}px`;
+            moon.style.top = `${(parentDiameter - diameter) / 2 + moonY}px`;
         });
         
         // Animate asteroids
@@ -592,13 +605,13 @@ console.log("Solar system visibility:",
             asteroid.dataset.angle = angle;
             
             // Calculate new position
-            const size = parseInt(asteroid.style.width);
-            const x = 2500 + Math.cos(angle) * radius - size/2;
-            const y = 2500 + Math.sin(angle) * radius - size/2;
+            const size = parseFloat(asteroid.style.width);
+            const x = systemCenter.x + Math.cos(angle) * radius;
+            const y = systemCenter.y + Math.sin(angle) * radius;
             
             // Update element position
-            asteroid.style.left = `${x}px`;
-            asteroid.style.top = `${y}px`;
+            asteroid.style.left = `${x - size/2}px`;
+            asteroid.style.top = `${y - size/2}px`;
         });
         
         // Handle tooltip scaling based on zoom
@@ -609,25 +622,15 @@ console.log("Solar system visibility:",
         requestAnimationFrame(animateCelestialBodies);
     }
     
-    // Function to update zoom level display
-    function updateZoomDisplay() {
-        const zoomLevelDisplay = document.getElementById('zoom-level');
-        if (zoomLevelDisplay) {
-            zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
-        }
-    }
-    
     // Zoom control buttons
     document.getElementById('zoom-in').addEventListener('click', function() {
         currentZoom = Math.min(currentZoom * 1.2, maxZoom);
         updateTransform();
-        updateZoomDisplay();
     });
     
     document.getElementById('zoom-out').addEventListener('click', function() {
         currentZoom = Math.max(currentZoom * 0.8, minZoom);
         updateTransform();
-        updateZoomDisplay();
     });
     
     document.getElementById('reset').addEventListener('click', function() {
@@ -635,7 +638,6 @@ console.log("Solar system visibility:",
         currentX = 0;
         currentY = 0;
         updateTransform();
-        updateZoomDisplay();
     });
     
     // Mouse events for dragging
@@ -677,7 +679,6 @@ console.log("Solar system visibility:",
         }
         
         updateTransform();
-        updateZoomDisplay();
     }, { passive: false });
     
     // Add touch controls for mobile devices
@@ -722,7 +723,6 @@ console.log("Solar system visibility:",
                 currentZoom = Math.min(Math.max(currentZoom * zoomFactor, minZoom), maxZoom);
                 touchStartDist = newDist;
                 updateTransform();
-                updateZoomDisplay();
             }
         }
         e.preventDefault();
@@ -746,9 +746,6 @@ console.log("Solar system visibility:",
     if (infoPanel && infoPanel.querySelector('h2')) {
         infoPanel.querySelector('h2').textContent = 'Sol';
     }
-    
-    // Update zoom level display
-    updateZoomDisplay();
     
     // Hide loading screen once initialization is complete
     const loadingScreen = document.getElementById('loading');
