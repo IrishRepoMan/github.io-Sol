@@ -171,9 +171,9 @@ body, html {
 
 .jupiter .body-content {
     background: linear-gradient(30deg, #a67c52, #d4a876, #e6c699);
-    background-image: repeating-linear-gradient(30deg, transparent, transparent 20px, rgba(150, 90, 60, 0.2) 20px, rgba(150, 90, 60, 0.2) 40px);
     box-shadow: 0 0 15px rgba(214, 168, 118, 0.7);
 }
+
 
 .io .body-content {
     background: linear-gradient(30deg, #aaaa00, #ffff00, #ffffaa);
@@ -182,9 +182,7 @@ body, html {
 
 .europa .body-content {
     background: linear-gradient(30deg, #cccccc, #ffffff, #ffffee);
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 255, 255, 0.7);
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
 }
 
 .ganymede .body-content {
@@ -194,9 +192,7 @@ body, html {
 
 .callisto .body-content {
     background: linear-gradient(30deg, #888888, #aaaaaa, #cccccc);
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 255, 255, 0.7);
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
 }
 
 .saturn .body-content {
