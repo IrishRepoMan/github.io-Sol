@@ -597,15 +597,25 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimationFrame(animateCelestialBodies);
     }
     
+    // Function to update zoom level display
+    function updateZoomDisplay() {
+        const zoomLevelDisplay = document.getElementById('zoom-level');
+        if (zoomLevelDisplay) {
+            zoomLevelDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+        }
+    }
+    
     // Zoom control buttons
     document.getElementById('zoom-in').addEventListener('click', function() {
         currentZoom = Math.min(currentZoom * 1.2, maxZoom);
         updateTransform();
+        updateZoomDisplay();
     });
     
     document.getElementById('zoom-out').addEventListener('click', function() {
         currentZoom = Math.max(currentZoom * 0.8, minZoom);
         updateTransform();
+        updateZoomDisplay();
     });
     
     document.getElementById('reset').addEventListener('click', function() {
@@ -613,6 +623,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentX = 0;
         currentY = 0;
         updateTransform();
+        updateZoomDisplay();
     });
     
     // Mouse events for dragging
@@ -654,6 +665,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         updateTransform();
+        updateZoomDisplay();
     }, { passive: false });
     
     // Add touch controls for mobile devices
@@ -698,6 +710,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentZoom = Math.min(Math.max(currentZoom * zoomFactor, minZoom), maxZoom);
                 touchStartDist = newDist;
                 updateTransform();
+                updateZoomDisplay();
             }
         }
         e.preventDefault();
@@ -715,6 +728,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the solar system
     createCelestialBodies();
     requestAnimationFrame(animateCelestialBodies);
+    
+    // Update the info panel title
+    const infoPanel = document.getElementById('info-panel');
+    if (infoPanel && infoPanel.querySelector('h2')) {
+        infoPanel.querySelector('h2').textContent = 'Sol';
+    }
+    
+    // Update zoom level display
+    updateZoomDisplay();
+    
+    // Hide loading screen once initialization is complete
+    const loadingScreen = document.getElementById('loading');
+    if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 500);
+    }
     
     console.log("Initialization complete");
 });
