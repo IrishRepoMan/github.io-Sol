@@ -21,33 +21,36 @@
             width: 100%;
             height: 100vh;
             overflow: hidden;
+            background-color: #000;
+            background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 2px);
+            background-size: 100px 100px;
         }
         
         #solar-system {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            width: 5000px;
-            height: 5000px;
+            width: 1000px; /* Smaller size for easier viewing */
+            height: 1000px;
+            transform-origin: center center;
         }
         
         .sun {
             position: absolute;
             width: 100px;
             height: 100px;
-            background-color: orange;
+            background: radial-gradient(circle at 30% 30%, #ffdb8c, #ff9500 40%, #fd6801 60%, #a64203);
             border-radius: 50%;
-            top: 2450px;
-            left: 2450px;
-            box-shadow: 0 0 50px yellow;
+            top: 450px; /* Center in the 1000px container */
+            left: 450px;
+            box-shadow: 0 0 50px rgba(255, 160, 60, 0.8);
         }
         
         .planet {
             position: absolute;
             width: 30px;
             height: 30px;
-            background-color: blue;
+            background: linear-gradient(30deg, #1a5599, #3399ff, #66ccff);
             border-radius: 50%;
         }
         
@@ -61,6 +64,10 @@
         button {
             padding: 10px;
             margin: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 4px;
             cursor: pointer;
         }
         
@@ -108,7 +115,7 @@
             if (!reset) debug.textContent += " | Reset missing";
             
             // Variables for zooming and panning
-            let scale = 0.2;
+            let scale = 1.0; // Start with a larger scale
             let offsetX = 0;
             let offsetY = 0;
             let isDragging = false;
@@ -116,27 +123,38 @@
             
             // Update transform
             function updateTransform() {
-                solarSystem.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+                solarSystem.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) scale(${scale})`;
                 debug.textContent = `Scale: ${scale.toFixed(2)}, X: ${offsetX}, Y: ${offsetY}`;
             }
             
-            // Add a simple planet
-            function addPlanet() {
-                const planet = document.createElement('div');
-                planet.className = 'planet';
-                planet.style.top = '2450px';
-                planet.style.left = '2700px'; // 250px to the right of the sun
-                solarSystem.appendChild(planet);
-                debug.textContent += " | Planet added";
+            // Add planets
+            function addPlanets() {
+                // Earth-like planet
+                const earth = document.createElement('div');
+                earth.className = 'planet';
+                earth.style.top = '450px';
+                earth.style.left = '600px'; // 150px to the right of the sun
+                
+                // Mars-like planet
+                const mars = document.createElement('div');
+                mars.className = 'planet';
+                mars.style.backgroundColor = '#ff6600';
+                mars.style.top = '450px';
+                mars.style.left = '700px'; // 250px to the right of the sun
+                
+                solarSystem.appendChild(earth);
+                solarSystem.appendChild(mars);
+                
+                debug.textContent += " | Planets added";
             }
             
             // Initialize
             updateTransform();
-            addPlanet();
+            addPlanets();
             
             // Add event listeners
             zoomIn.addEventListener('click', function() {
-                scale = Math.min(scale * 1.2, 1.5);
+                scale = Math.min(scale * 1.2, 3.0);
                 updateTransform();
             });
             
@@ -146,7 +164,7 @@
             });
             
             reset.addEventListener('click', function() {
-                scale = 0.2;
+                scale = 1.0;
                 offsetX = 0;
                 offsetY = 0;
                 updateTransform();
@@ -171,6 +189,21 @@
             document.addEventListener('mouseup', function() {
                 isDragging = false;
             });
+            
+            // Mouse wheel zoom
+            document.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                
+                if (e.deltaY < 0) {
+                    // Zoom in
+                    scale = Math.min(scale * 1.1, 3.0);
+                } else {
+                    // Zoom out
+                    scale = Math.max(scale * 0.9, 0.1);
+                }
+                
+                updateTransform();
+            }, { passive: false });
         });
     </script>
 </body>
