@@ -1,3 +1,67 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+#universe {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #000;
+    background-image: url('assets/images/stars-bg.png');
+    background-size: cover;
+}
+
+#solar-system {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5000px;
+    height: 5000px;
+    transform-origin: center;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.celestial-body {
+    position: absolute;
+    border-radius: 50%;
+    overflow: visible;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: box-shadow 0.3s;
+}
+
+.celestial-body .body-content {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    position: relative;
+    z-index: 10;
+}
+
+.celestial-body:hover {
+    z-index: 1000;
+}
+
+.sun .body-content {
+    background: radial-gradient(circle at 30% 30%, #ffdb8c, #ff9500 40%, #fd6801 60%, #a64203);
+    box-shadow: 0 0 50px rgba(255, 160, 60, 0.8);
+}
+
 /* Tooltip styling with zoom adaptability */
 .tooltip {
     position: absolute;
@@ -64,6 +128,7 @@
     border-radius: 50%;
     pointer-events: none;
     z-index: 5;
+    transform-style: preserve-3d;
 }
 
 .moon-orbit {
@@ -72,6 +137,7 @@
     border-radius: 50%;
     pointer-events: none;
     z-index: 5;
+    transform-style: preserve-3d;
 }
 
 /* Improved planet styling with better visibility */
@@ -186,6 +252,13 @@
     z-index: 8;
 }
 
+/* Moon specific styles to ensure visibility */
+.moon {
+    position: absolute;
+    transform-style: preserve-3d;
+    z-index: 60;
+}
+
 /* Responsive design for smaller screens */
 @media (max-width: 768px) {
     #controls {
@@ -268,40 +341,4 @@
 #current-focus {
     font-style: italic;
     color: #aaddff;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    background-color: black;
-    color: white;
-    font-family: Arial, sans-serif;
-}
-
-#universe {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-    background-color: #000;
-    background-image: url('assets/images/stars-bg.png');
-    background-size: cover;
-}
-
-#solar-system {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5000px;
-    height: 5000px;
-    transform-origin: center;
 }
