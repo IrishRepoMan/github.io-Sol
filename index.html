@@ -22,16 +22,16 @@
             height: 100vh;
             overflow: hidden;
             background-color: #000;
-            background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 2px);
-            background-size: 100px 100px;
+            background-image: url('assets/images/stars-bg.png');
+            background-size: cover;
         }
         
         #solar-system {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 1000px; /* Smaller size for easier viewing */
-            height: 1000px;
+            width: 2000px; /* Larger to accommodate orbits */
+            height: 2000px;
             transform-origin: center center;
         }
         
@@ -41,9 +41,10 @@
             height: 100px;
             background: radial-gradient(circle at 30% 30%, #ffdb8c, #ff9500 40%, #fd6801 60%, #a64203);
             border-radius: 50%;
-            top: 450px; /* Center in the 1000px container */
-            left: 450px;
+            top: 950px; /* Center in the 2000px container */
+            left: 950px;
             box-shadow: 0 0 50px rgba(255, 160, 60, 0.8);
+            z-index: 10; /* Keep sun above other elements */
         }
         
         .planet {
@@ -52,6 +53,17 @@
             height: 30px;
             background: linear-gradient(30deg, #1a5599, #3399ff, #66ccff);
             border-radius: 50%;
+            transform-origin: 1000px 1000px; /* Orbits around the center */
+            z-index: 5;
+        }
+        
+        .orbit {
+            position: absolute;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         
         #controls {
@@ -79,13 +91,35 @@
             padding: 10px;
             z-index: 100;
         }
+        
+        .tooltip {
+            position: absolute;
+            width: 200px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 20;
+        }
+        
+        .planet:hover .tooltip, .sun:hover .tooltip {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <div id="universe">
         <div id="solar-system">
-            <div class="sun"></div>
-            <!-- Planets will be added by JavaScript -->
+            <div class="sun">
+                <div class="tooltip">
+                    <h3>Sol</h3>
+                    <p>Our solar system's star, providing energy to all planets and supporting life on Earth.</p>
+                </div>
+            </div>
+            <!-- Orbits and planets will be added by JavaScript -->
         </div>
     </div>
     
@@ -115,11 +149,47 @@
             if (!reset) debug.textContent += " | Reset missing";
             
             // Variables for zooming and panning
-            let scale = 1.0; // Start with a larger scale
+            let scale = 0.5; // Start with a medium scale to see everything
             let offsetX = 0;
             let offsetY = 0;
             let isDragging = false;
             let startX, startY;
+            
+            // Planet data
+            const planets = [
+                {
+                    name: "Mercury",
+                    diameter: 20,
+                    orbitRadius: 150,
+                    orbitSpeed: 4.1,
+                    color: "#a6a6a6",
+                    description: "The smallest and innermost planet, known for extreme environment technologies and specialized mining operations."
+                },
+                {
+                    name: "Venus",
+                    diameter: 38,
+                    orbitRadius: 200,
+                    orbitSpeed: 1.6,
+                    color: "#e6e600",
+                    description: "Earth's toxic twin with a runaway greenhouse effect, now a major mining operation under Terra's authority."
+                },
+                {
+                    name: "Earth",
+                    diameter: 40,
+                    orbitRadius: 250,
+                    orbitSpeed: 1,
+                    color: "#3399ff",
+                    description: "Humanity's birthplace, now partially rewilded and serving as a biological repository with most population in orbital habitats."
+                },
+                {
+                    name: "Mars",
+                    diameter: 30,
+                    orbitRadius: 300,
+                    orbitSpeed: 0.53,
+                    color: "#ff6600",
+                    description: "The solar system's breadbasket with terraformed agricultural domes producing food for trillions of humans."
+                }
+            ];
             
             // Update transform
             function updateTransform() {
@@ -127,34 +197,81 @@
                 debug.textContent = `Scale: ${scale.toFixed(2)}, X: ${offsetX}, Y: ${offsetY}`;
             }
             
-            // Add planets
-            function addPlanets() {
-                // Earth-like planet
-                const earth = document.createElement('div');
-                earth.className = 'planet';
-                earth.style.top = '450px';
-                earth.style.left = '600px'; // 150px to the right of the sun
+            // Create planets and their orbits
+            function createSolarSystem() {
+                // Create orbits and planets
+                planets.forEach(planet => {
+                    // Create orbit
+                    const orbit = document.createElement('div');
+                    orbit.className = 'orbit';
+                    orbit.style.width = `${planet.orbitRadius * 2}px`;
+                    orbit.style.height = `${planet.orbitRadius * 2}px`;
+                    
+                    // Create planet
+                    const planetElement = document.createElement('div');
+                    planetElement.className = 'planet';
+                    planetElement.style.width = `${planet.diameter}px`;
+                    planetElement.style.height = `${planet.diameter}px`;
+                    
+                    // Random starting position
+                    const angle = Math.random() * Math.PI * 2;
+                    planetElement.style.left = `${1000 + Math.cos(angle) * planet.orbitRadius - planet.diameter/2}px`;
+                    planetElement.style.top = `${1000 + Math.sin(angle) * planet.orbitRadius - planet.diameter/2}px`;
+                    
+                    // Apply color
+                    planetElement.style.background = planet.color;
+                    
+                    // Add tooltip
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.innerHTML = `<h3>${planet.name}</h3><p>${planet.description}</p>`;
+                    planetElement.appendChild(tooltip);
+                    
+                    // Store orbit data for animation
+                    planetElement.dataset.angle = angle;
+                    planetElement.dataset.orbitSpeed = planet.orbitSpeed;
+                    planetElement.dataset.orbitRadius = planet.orbitRadius;
+                    
+                    // Add to solar system
+                    solarSystem.appendChild(orbit);
+                    solarSystem.appendChild(planetElement);
+                });
                 
-                // Mars-like planet
-                const mars = document.createElement('div');
-                mars.className = 'planet';
-                mars.style.backgroundColor = '#ff6600';
-                mars.style.top = '450px';
-                mars.style.left = '700px'; // 250px to the right of the sun
+                debug.textContent += " | Solar system created";
+            }
+            
+            // Animate planets
+            function animatePlanets() {
+                document.querySelectorAll('.planet').forEach(planet => {
+                    let angle = parseFloat(planet.dataset.angle);
+                    const orbitSpeed = parseFloat(planet.dataset.orbitSpeed);
+                    const orbitRadius = parseFloat(planet.dataset.orbitRadius);
+                    
+                    // Update angle
+                    angle += 0.005 * orbitSpeed;
+                    planet.dataset.angle = angle;
+                    
+                    // Calculate new position
+                    const diameter = parseInt(planet.style.width);
+                    const x = 1000 + Math.cos(angle) * orbitRadius - diameter/2;
+                    const y = 1000 + Math.sin(angle) * orbitRadius - diameter/2;
+                    
+                    // Update position
+                    planet.style.left = `${x}px`;
+                    planet.style.top = `${y}px`;
+                });
                 
-                solarSystem.appendChild(earth);
-                solarSystem.appendChild(mars);
-                
-                debug.textContent += " | Planets added";
+                requestAnimationFrame(animatePlanets);
             }
             
             // Initialize
             updateTransform();
-            addPlanets();
+            createSolarSystem();
+            animatePlanets();
             
             // Add event listeners
             zoomIn.addEventListener('click', function() {
-                scale = Math.min(scale * 1.2, 3.0);
+                scale = Math.min(scale * 1.2, 2.0);
                 updateTransform();
             });
             
@@ -164,7 +281,7 @@
             });
             
             reset.addEventListener('click', function() {
-                scale = 1.0;
+                scale = 0.5;
                 offsetX = 0;
                 offsetY = 0;
                 updateTransform();
@@ -196,7 +313,7 @@
                 
                 if (e.deltaY < 0) {
                     // Zoom in
-                    scale = Math.min(scale * 1.1, 3.0);
+                    scale = Math.min(scale * 1.1, 2.0);
                 } else {
                     // Zoom out
                     scale = Math.max(scale * 0.9, 0.1);
@@ -204,6 +321,14 @@
                 
                 updateTransform();
             }, { passive: false });
+            
+            // Click to view detail
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('planet') || e.target.classList.contains('sun')) {
+                    const name = e.target.querySelector('.tooltip h3').textContent.toLowerCase();
+                    window.location.href = `detail.html?body=${name}`;
+                }
+            });
         });
     </script>
 </body>
