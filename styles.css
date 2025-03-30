@@ -342,3 +342,39 @@ body, html {
     font-style: italic;
     color: #aaddff;
 }
+
+.celestial-body {
+    transition: transform 0.3s ease-out;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+}
+
+.celestial-body .body-content {
+    transition: transform 0.3s ease-out;
+}
+
+.celestial-body:hover {
+    z-index: 1000 !important;
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.6));
+}
+
+.tooltip {
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1100;
+}
+
+.celestial-body:hover .tooltip {
+    opacity: 1;
+}
+
+.planet-rings {
+    transform: rotateX(75deg);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.orbit, .moon-orbit {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.1));
+}
