@@ -1165,3 +1165,13 @@ if (loadingScreen) {
 
 console.log("Initialization complete");
 });
+
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        const loadingScreen = document.getElementById('loading');
+        if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            loadingScreen.style.display = 'none';
+        }
+    }, 3000); // Force removal after 3 seconds
+});
