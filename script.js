@@ -13,8 +13,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Apply initial zoom
     function updateTransform() {
-        solarSystem.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentZoom})`;
-    }
+        solarSystem.style.transform = `translate(calc(${currentX}px - 50%), calc(${currentY}px - 50%)) scale(${currentZoom})`;
+    console.log("Applied transform:", solarSystem.style.transform);
+}
     
     updateTransform();
     
