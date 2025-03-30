@@ -32,28 +32,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateMoonOrbits() {
-        document.querySelectorAll('.celestial-body.moon').forEach(moon => {
-            const parentBody = moon.dataset.parentBody;
-            if (!parentBody) return;
-            
-            const parentElement = document.querySelector(`.${parentBody.toLowerCase()}`);
-            if (!parentElement) return;
-            
-            const parentDiameter = parseFloat(parentElement.style.width);
-            let orbitRadius = parseFloat(moon.dataset.orbitRadius || 0);
-            
-            const minRadius = parentDiameter * 0.7;
-            orbitRadius = Math.max(orbitRadius, minRadius);
-            moon.dataset.adjustedRadius = orbitRadius;
-            
-            const orbit = parentElement.querySelector(`.moon-orbit[data-moon="${moon.getAttribute('data-name')}"]`);
-            if (orbit) {
-                orbit.style.width = `${orbitRadius * 2}px`;
-                orbit.style.height = `${orbitRadius * 2}px`;
-                orbit.style.left = `${(parentDiameter - orbitRadius * 2) / 2}px`;
-                orbit.style.top = `${(parentDiameter - orbitRadius * 2) / 2}px`;
-            }
-        });
+       document.querySelectorAll('.celestial-body.moon').forEach(moon => {
+    let angle = parseFloat(moon.dataset.angle || 0);
+    const speed = parseFloat(moon.dataset.orbitSpeed || 0);
+    const radius = parseFloat(moon.dataset.adjustedRadius || moon.dataset.orbitRadius || 0);
+    
+    angle += (0.0005 * speed * deltaTime);
+    if (angle > Math.PI * 2) angle -= Math.PI * 2;
+    moon.dataset.angle = angle;
+    
+    const parentElement = moon.parentElement;
+    if (!parentElement) return;
+    
+    const diameter = parseFloat(moon.style.width);
+    const parentDiameter = parseFloat(parentElement.style.width);
+    
+    // Calculate position based on orbit radius and angle
+    const moonX = radius * Math.cos(angle);
+    const moonY = radius * Math.sin(angle);
+    
+    // Position centered on parent and offset by orbit
+    moon.style.left = `${(parentDiameter - diameter) / 2 + moonX}px`;
+    moon.style.top = `${(parentDiameter - diameter) / 2 + moonY}px`;
+});
     }
     
     function updateBodyVisibility() {
