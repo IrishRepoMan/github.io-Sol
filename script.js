@@ -458,8 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
             bodyContent.className = 'body-content';
             
             if (body.name === "Jupiter") {
-                bodyContent.style.backgroundImage = "repeating-linear-gradient(30deg, transparent, transparent 20px, rgba(150, 90, 60, 0.3) 20px, rgba(150, 90, 60, 0.3) 40px)";
-            }
+                }
             
             const tooltip = document.createElement('div');
             tooltip.className = 'tooltip';
@@ -542,9 +541,6 @@ document.addEventListener('DOMContentLoaded', function() {
             bodyContent.className = 'body-content';
             
             if (body.name === "Europa" || body.name === "Callisto") {
-                bodyContent.style.boxShadow = "inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 255, 255, 0.7)";
-                bodyContent.style.border = "2px solid rgba(255, 255, 255, 0.8)";
-                bodyContent.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
             }
             
             const tooltip = document.createElement('div');
