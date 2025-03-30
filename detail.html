@@ -8,21 +8,30 @@
     <style>
         body {
             overflow: auto;
-            padding: 50px;
+            padding: 0;
+            background-color: #000;
+            background-image: url('assets/images/stars-bg.png');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #fff;
         }
         
         #detail-container {
             max-width: 1000px;
-            margin: 0 auto;
-            background-color: rgba(0, 0, 0, 0.7);
+            margin: 80px auto 40px;
+            background-color: rgba(0, 0, 0, 0.8);
             border-radius: 10px;
             padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
         }
         
         .detail-header {
             display: flex;
             align-items: center;
             margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 20px;
         }
         
         .body-image {
@@ -30,6 +39,7 @@
             height: 200px;
             border-radius: 50%;
             margin-right: 30px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
         }
         
         .back-button {
@@ -37,11 +47,71 @@
             top: 20px;
             left: 20px;
             padding: 10px 15px;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(0, 0, 0, 0.7);
             color: white;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 5px;
             cursor: pointer;
+            z-index: 10;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        .back-button:hover {
+            background-color: rgba(50, 50, 50, 0.8);
+            transform: scale(1.05);
+        }
+        
+        #body-description {
+            line-height: 1.6;
+        }
+        
+        #body-description h2 {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+            color: #aaddff;
+        }
+        
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            gap: 20px;
+        }
+        
+        .stat-box {
+            background-color: rgba(50, 50, 80, 0.4);
+            border-radius: 5px;
+            padding: 15px;
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid rgba(100, 100, 150, 0.3);
+        }
+        
+        .stat-box h3 {
+            margin-top: 0;
+            color: #aaddff;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            #detail-container {
+                margin: 60px 15px 20px;
+                padding: 20px;
+            }
+            
+            .detail-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .body-image {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
         }
     </style>
 </head>
@@ -68,43 +138,251 @@
             const urlParams = new URLSearchParams(window.location.search);
             const bodyName = urlParams.get('body');
             
-            // For now, we'll just show the name
-            // In a real implementation, you would fetch data about this specific body
-            document.getElementById('body-name').textContent = bodyName.charAt(0).toUpperCase() + bodyName.slice(1);
+            if (!bodyName) {
+                window.location.href = 'index.html';
+                return;
+            }
             
-            // Simulate loading detailed content - in a real implementation you'd load this from a data file
-            setTimeout(() => {
-                document.getElementById('body-description').innerHTML = `
-                    <p>This is detailed information about ${bodyName}. In your full implementation, you would load
-                    specific data for each celestial body from your database or JSON files.</p>
-                    <p>For now, this is just placeholder text to show how the detail page would work.</p>
-                    <h2>History</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget
-                    ultricies tincidunt, nisl nunc aliquam nunc, id aliquam nunc nisl eget nunc.</p>
-                    <h2>Current Status</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget
-                    ultricies tincidunt, nisl nunc aliquam nunc, id aliquam nunc nisl eget nunc.</p>
+            // Format the name properly
+            const formattedName = bodyName.charAt(0).toUpperCase() + bodyName.slice(1);
+            document.getElementById('body-name').textContent = formattedName;
+            document.title = `Sol - ${formattedName}`;
+            
+            // Celestial bodies data - this should match your script.js data
+            const celestialBodies = [
+                {
+                    name: "Sol",
+                    diameter: 1392700,
+                    type: "Star",
+                    description: "Our solar system's star, providing energy to all planets and supporting life on Earth. In 2990 CE, Sol remains the central anchor point for human civilization, with vast energy collection arrays in Mercury's orbit harvesting its output.",
+                    color: "#fd6801",
+                    details: {
+                        composition: "Hydrogen (73%), Helium (25%), Other elements (2%)",
+                        temperature: "5,500°C surface, 15,000,000°C core",
+                        age: "4.6 billion years",
+                        notes: "Sol's energy has been harnessed through increasingly efficient collection methods over the centuries, powering humanity's expansion through the solar system."
+                    }
+                },
+                {
+                    name: "Mercury",
+                    diameter: 4879,
+                    type: "Planet",
+                    description: "The smallest and innermost planet, known for extreme environment technologies and specialized mining operations. Mercury's hostile conditions have bred a culture of technological adaptation, making it a key supplier of heat management systems and radiation shielding throughout the system.",
+                    color: "#a6a6a6",
+                    details: {
+                        composition: "Rock, metal, minimal atmosphere",
+                        temperature: "-173°C to 427°C (extreme variation)",
+                        population: "320 million (mostly in orbital habitats)",
+                        resources: "Heavy metals, rare elements, solar energy",
+                        notes: "Mercury harbors a dark secret: a massive slave-based economy that would provoke system-wide intervention if discovered."
+                    }
+                },
+                {
+                    name: "Venus",
+                    diameter: 12104,
+                    type: "Planet",
+                    description: "Earth's toxic twin with a runaway greenhouse effect, now a major mining operation under Terra's authority. Venus operations focus on extracting valuable minerals from its atmosphere and surface, shipping them throughout the system under long-standing trade agreements with Mars.",
+                    color: "#e6e600",
+                    details: {
+                        composition: "Rocky core, dense atmosphere (96% CO₂)",
+                        temperature: "462°C average surface",
+                        population: "350 billion (orbital habitats only)",
+                        resources: "Carbon compounds, sulfuric elements, atmospheric gases",
+                        notes: "Terraforming efforts have made minimal progress despite centuries of atmospheric modification attempts."
+                    }
+                },
+                {
+                    name: "Earth",
+                    diameter: 12756,
+                    type: "Planet",
+                    description: "Humanity's birthplace, now partially rewilded and serving as a biological repository with most population in orbital habitats. After centuries of ecological restoration, Earth has returned to a more natural state, with limited human presence on the surface focused on preservation and research.",
+                    color: "#3399ff",
+                    details: {
+                        composition: "Rock, water, nitrogen-oxygen atmosphere",
+                        temperature: "15°C average (restored climate)",
+                        population: "1.2 trillion (mostly in orbital habitats)",
+                        resources: "Biological diversity, water, cultural heritage",
+                        notes: "Access to Earth's surface is strictly regulated, with permits generally reserved for scientific research and ecological management."
+                    }
+                },
+                {
+                    name: "Luna",
+                    diameter: 3475,
+                    type: "Moon (Earth)",
+                    description: "Earth's moon, home to early human colonization efforts and historical sites of significance. Luna hosts numerous heritage sites marking humanity's first steps beyond Earth, carefully preserved alongside modern infrastructure supporting Earth orbital operations.",
+                    color: "#cccccc",
+                    details: {
+                        composition: "Rock, minimal volatiles",
+                        temperature: "-173°C to 127°C",
+                        resources: "Regolith, helium-3, historical significance",
+                        notes: "Luna's far side hosts sensitive astronomical instruments shielded from Earth's radio noise."
+                    }
+                },
+                {
+                    name: "Mars",
+                    diameter: 6792,
+                    type: "Planet",
+                    description: "The solar system's breadbasket with terraformed agricultural domes producing food for trillions of humans. Mars has developed a specialized society centered around efficient food production, with complex political structures based on water rights and dome management.",
+                    color: "#ff6600",
+                    details: {
+                        composition: "Rock, ice, thin CO₂ atmosphere (gradually thickening)",
+                        temperature: "-153°C to 20°C (varies greatly between domed and undomed regions)",
+                        population: "900 billion",
+                        resources: "Agriculture, water ice, terraforming expertise",
+                        notes: "Martian agricultural zones operate under a complex federation, with water access forming the basis of political power."
+                    }
+                },
+                {
+                    name: "Jupiter",
+                    diameter: 142984,
+                    type: "Gas Giant",
+                    description: "A gas giant and economic superpower controlling energy resources and advanced technologies. Jupiter's strategic position and control over helium-3 extraction has made it into a financial and technological hub with significant political influence throughout the system.",
+                    color: "#ffcc99",
+                    details: {
+                        composition: "Hydrogen, helium, ammonia clouds",
+                        temperature: "-145°C (cloud tops)",
+                        population: "480 million (orbital habitats and moons)",
+                        resources: "Helium-3, fusion technology, financial services",
+                        notes: "The Jovian Economic Alliance functions as both government and corporate entity, maintaining strict meritocratic principles in governance."
+                    }
+                },
+                {
+                    name: "Saturn",
+                    diameter: 120536,
+                    type: "Gas Giant",
+                    description: "Ringed gas giant under the control of the Outer System Empire, with strategic resource operations. Saturn's rings and moons provide crucial resources for the empire, while its distance from the inner system creates natural defensive advantages.",
+                    color: "#ffe6b3",
+                    details: {
+                        composition: "Hydrogen, helium, icy rings",
+                        temperature: "-178°C (cloud tops)",
+                        population: "Part of 320 million Outer System Empire",
+                        resources: "Water ice, hydrocarbons from Titan, ring minerals",
+                        notes: "The imperial capital on Titan manages operations throughout Saturn, Uranus, and Neptune under a Byzantine political structure."
+                    }
+                },
+                {
+                    name: "Uranus",
+                    diameter: 51118,
+                    type: "Ice Giant",
+                    description: "Ice giant under Outer System Empire control with specialized gas extraction operations. Uranus provides crucial resources for the empire while maintaining a relatively small permanent population concentrated on a few moons.",
+                    color: "#77ccff",
+                    details: {
+                        composition: "Hydrogen, helium, methane (creates blue color)",
+                        temperature: "-224°C (cloud tops)",
+                        population: "Part of 320 million Outer System Empire",
+                        resources: "Methane, gas extraction, specialized cold chemistry",
+                        notes: "Uranus was the site of the only major military conflict between Jupiter and the Outer System Empire, resolved through the Treaty of Oberon in 2425."
+                    }
+                },
+                {
+                    name: "Neptune",
+                    diameter: 49528,
+                    type: "Ice Giant",
+                    description: "The outermost gas giant controlled by the Outer System Empire, with deuterium and tritium extraction facilities. Neptune's unique chemical composition provides resources found nowhere else in the system, giving the empire leverage in certain specialized markets.",
+                    color: "#3366ff",
+                    details: {
+                        composition: "Hydrogen, helium, methane (deeper blue than Uranus)",
+                        temperature: "-218°C (cloud tops)",
+                        population: "Part of 320 million Outer System Empire",
+                        resources: "Deuterium, tritium, specialized atmospheric compounds",
+                        notes: "Neptune's isolation makes it both the most secure imperial territory and the most challenging to supply."
+                    }
+                },
+                {
+                    name: "Pluto",
+                    diameter: 2376,
+                    type: "Dwarf Planet",
+                    description: "Dwarf planet serving as humanity's forward scientific observatory, accessible to all factions for research. Under longstanding agreements, Pluto operates as neutral scientific territory with representatives from all major powers contributing to and benefiting from its research.",
+                    color: "#ccb399",
+                    details: {
+                        composition: "Rock, water ice, nitrogen ice",
+                        temperature: "-233°C average",
+                        population: "15,000-20,000 (primarily researchers)",
+                        resources: "Scientific data, neutral meeting ground",
+                        notes: "Pluto's scientific community focuses heavily on potential interstellar travel methods following three failed attempts to reach nearby star systems."
+                    }
+                }
+                // Add any other bodies you need
+            ];
+            
+            // Find the data for the requested body
+            const bodyData = celestialBodies.find(body => 
+                body.name.toLowerCase() === bodyName.toLowerCase()
+            );
+            
+            if (bodyData) {
+                // Set the body type
+                document.getElementById('body-type').textContent = bodyData.type;
+                
+                // Set the body image background color
+                const bodyImage = document.getElementById('body-image');
+                bodyImage.style.backgroundColor = bodyData.color;
+                
+                // Add appropriate styling based on the body type
+                if (bodyData.name === "Sol") {
+                    bodyImage.style.background = "radial-gradient(circle at 30% 30%, #ffdb8c, #ff9500 40%, #fd6801 60%, #a64203)";
+                    bodyImage.style.boxShadow = "0 0 50px rgba(255, 160, 60, 0.8)";
+                } else if (bodyData.name === "Saturn") {
+                    // Add rings to Saturn
+                    bodyImage.style.position = "relative";
+                    const rings = document.createElement('div');
+                    rings.style.position = "absolute";
+                    rings.style.width = "300px";
+                    rings.style.height = "30px";
+                    rings.style.backgroundColor = "rgba(210, 180, 140, 0.7)";
+                    rings.style.left = "-50px";
+                    rings.style.top = "85px";
+                    rings.style.transform = "rotateX(75deg)";
+                    rings.style.borderRadius = "50%";
+                    bodyImage.appendChild(rings);
+                }
+                
+                // Populate the description
+                let descriptionHTML = `
+                    <p>${bodyData.description}</p>
+                    
+                    <div class="stats-container">
+                        <div class="stat-box">
+                            <h3>Physical Characteristics</h3>
+                            <p><strong>Diameter:</strong> ${bodyData.diameter.toLocaleString()} km</p>
+                            <p><strong>Composition:</strong> ${bodyData.details.composition}</p>
+                            <p><strong>Temperature:</strong> ${bodyData.details.temperature}</p>
+                        </div>
                 `;
                 
-                // Set a background for the image based on the body name
-                const bodyImage = document.getElementById('body-image');
+                if (bodyData.details.population) {
+                    descriptionHTML += `
+                        <div class="stat-box">
+                            <h3>Population</h3>
+                            <p><strong>Total:</strong> ${bodyData.details.population}</p>
+                        </div>
+                    `;
+                }
                 
-                // This is just a placeholder - in a real implementation you'd use actual images
-                const colors = {
-                    'sol': '#fd6801',
-                    'mercury': '#a6a6a6',
-                    'venus': '#e6e600',
-                    'earth': '#3399ff',
-                    'mars': '#ff6600',
-                    'jupiter': '#ff9966',
-                    'saturn': '#ffcc99',
-                    'uranus': '#99ccff',
-                    'neptune': '#3366ff',
-                    'pluto': '#cc9966'
-                };
+                descriptionHTML += `
+                    <div class="stat-box">
+                        <h3>Resources</h3>
+                        <p>${bodyData.details.resources}</p>
+                    </div>
+                `;
                 
-                bodyImage.style.backgroundColor = colors[bodyName] || '#888888';
-            }, 500);
+                descriptionHTML += `
+                    </div>
+                    
+                    <h2>Current Status</h2>
+                    <p>${bodyData.details.notes}</p>
+                    
+                    <h2>Historical Significance</h2>
+                    <p>This section would contain detailed historical information about ${bodyData.name}'s role in human expansion throughout the solar system.</p>
+                `;
+                
+                document.getElementById('body-description').innerHTML = descriptionHTML;
+            } else {
+                // Handle case where the body isn't found
+                document.getElementById('body-description').innerHTML = `
+                    <p>No information available for ${formattedName}. Please return to the solar system view.</p>
+                `;
+            }
         });
     </script>
 </body>
