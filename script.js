@@ -487,11 +487,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
            element.appendChild(bodyContent);
 element.appendChild(tooltip);
-parentElement.appendChild(element);
-parentElement.appendChild(orbit);
+solarSystem.appendChild(element);  // Append to solar system, not parent element
+solarSystem.appendChild(orbit);    // Append to solar system, not parent element
 
-element.addEventListener('click', function(e) {
-    e.stopPropagation();
+element.addEventListener('click', function() {
     window.location.href = `detail.html?body=${body.name.toLowerCase()}`;
 });
 
