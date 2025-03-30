@@ -30,7 +30,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 5000px; /* Larger for full solar system */
+            transform: translate(-50%, -50%);
+            width: 5000px;
             height: 5000px;
             transform-origin: center center;
         }
@@ -210,6 +211,8 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("Script loading...");
+            
             // Configuration
             const solarSystem = document.getElementById('solar-system');
             const minZoom = 0.1;
@@ -219,7 +222,15 @@
             let startDragX, startDragY;
             let currentX = 0, currentY = 0;
             
+            console.log("Solar system element:", solarSystem);
+            
             // Apply initial zoom
+            function updateTransform() {
+                const transform = `translate(-50%, -50%) scale(${currentZoom}) translate(${currentX/currentZoom}px, ${currentY/currentZoom}px)`;
+                console.log("Applying transform:", transform);
+                solarSystem.style.transform = transform;
+            }
+            
             updateTransform();
             
             const celestialBodies = [
@@ -370,6 +381,8 @@
             
             // Create celestial bodies
             function createCelestialBodies() {
+                console.log("Creating celestial bodies...");
+                
                 celestialBodies.forEach(body => {
                     if (body.name === "Sol") {
                         // The sun is already in our HTML, just need to adjust its size
@@ -378,6 +391,7 @@
                         sunElement.style.height = `${body.diameter}px`;
                         sunElement.style.left = `${body.position.x - body.diameter/2}px`;
                         sunElement.style.top = `${body.position.y - body.diameter/2}px`;
+                        console.log("Sun positioned at:", sunElement.style.left, sunElement.style.top);
                         return;
                     }
                     
@@ -427,6 +441,8 @@
                     element.dataset.angle = angle;
                     element.dataset.orbitSpeed = body.orbitSpeed;
                     element.dataset.orbitRadius = body.orbitRadius;
+                    
+                    console.log(`Created ${body.name} at position:`, x, y);
                 });
                 
                 // Create asteroid belt
@@ -435,11 +451,13 @@
             
             // Create asteroid belt
             function createAsteroidBelt() {
+                console.log("Creating asteroid belt...");
+                
                 const beltContainer = document.createElement('div');
                 beltContainer.className = 'asteroid-belt';
                 
                 // Create individual asteroids
-                const asteroidCount = 500;
+                const asteroidCount = 200; // Reduced for better performance
                 const minRadius = 700;
                 const maxRadius = 850;
                 
@@ -468,6 +486,7 @@
                 }
                 
                 solarSystem.appendChild(beltContainer);
+                console.log("Asteroid belt created with", asteroidCount, "asteroids");
             }
             
             // Update positions for animation
@@ -517,11 +536,6 @@
                 requestAnimationFrame(animateCelestialBodies);
             }
             
-            // Pan and zoom functionality
-            function updateTransform() {
-                solarSystem.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentZoom})`;
-            }
-            
             // Zoom control buttons
             document.getElementById('zoom-in').addEventListener('click', function() {
                 currentZoom = Math.min(currentZoom * 1.2, maxZoom);
@@ -555,7 +569,7 @@
                 currentY = e.clientY - startDragY;
                 
                 // Limit panning
-                const maxPan = 1000 * currentZoom;
+                const maxPan = 1000;
                 currentX = Math.max(Math.min(currentX, maxPan), -maxPan);
                 currentY = Math.max(Math.min(currentY, maxPan), -maxPan);
                 
@@ -584,6 +598,8 @@
             // Initialize the solar system
             createCelestialBodies();
             animateCelestialBodies();
+            
+            console.log("Initialization complete");
         });
     </script>
 </body>
