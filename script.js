@@ -457,30 +457,7 @@ function updateTransform() {
             type: "moon",
             inclination: 0.05
         }
-        {
-    name: "Phobos",
-    diameter: 6,
-    orbitRadius: 18,
-    orbitSpeed: 3,
-    parentBody: "Mars",
-    color: "#aaaaaa",
-    description: "Mars' larger moon, now home to orbital transfer stations and habitat construction facilities.",
-    type: "moon",
-    inclination: 0.04
-},
-{
-    name: "Deimos",
-    diameter: 4,
-    orbitRadius: 26,
-    orbitSpeed: 2,
-    parentBody: "Mars",
-    color: "#999999",
-    description: "Mars' smaller moon, hosting observatories and communication relay stations.",
-    type: "moon",
-    inclination: 0.07
-},
-
-// Additional moons of Jupiter
+       }, 
 {
     name: "Amalthea",
     diameter: 5,
