@@ -15,6 +15,17 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateTransform() {
         solarSystem.style.transform = `translate(calc(${currentX}px - 50%), calc(${currentY}px - 50%)) scale(${currentZoom})`;
     console.log("Applied transform:", solarSystem.style.transform);
+
+        // Make sure elements are visible
+document.getElementById('solar-system').style.visibility = 'visible';
+document.getElementById('solar-system').style.opacity = '1';
+document.getElementById('universe').style.backgroundColor = '#000';
+
+// Debug element visibility
+console.log("Solar system visibility:", 
+    window.getComputedStyle(solarSystem).getPropertyValue('visibility'),
+    "Opacity:", 
+    window.getComputedStyle(solarSystem).getPropertyValue('opacity'));
 }
     
     updateTransform();
