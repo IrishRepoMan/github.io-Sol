@@ -394,3 +394,46 @@ body, html {
     opacity: 1;
     display: block;
 }
+
+.celestial-body {
+    position: absolute;
+    border-radius: 50%;
+    overflow: visible;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease-out;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+    will-change: transform, left, top;
+    backface-visibility: hidden;
+}
+
+#solar-system {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5000px;
+    height: 5000px;
+    transform-origin: center;
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.orbit {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 5;
+    transform-style: preserve-3d;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.1));
+}
+
+.moon-orbit {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 5;
+    transform-style: preserve-3d;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.1));
+}
