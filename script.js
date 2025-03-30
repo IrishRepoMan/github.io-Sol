@@ -39,6 +39,23 @@ function updateTransform() {
     updateZoomDisplay();
     updateBodyVisibility();
 }
+    window.onerror = function(message, source, lineno, colno, error) {
+    console.error("Error encountered:", message);
+    console.error("At:", source, "Line:", lineno, "Column:", colno);
+    console.error("Stack trace:", error ? error.stack : "Not available");
+    
+    // Force remove loading screen if there's an error
+    const loadingScreen = document.getElementById('loading');
+    if (loadingScreen) {
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.display = 'none';
+    }
+    
+    // Display an error message to the user
+    alert("An error occurred while loading the solar system. Please check the console for details.");
+    
+    return true; // This prevents the browser's default error handling
+};
     
     function updateMoonOrbits() {
         document.querySelectorAll('.celestial-body.moon').forEach(moon => {
