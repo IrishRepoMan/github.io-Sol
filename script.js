@@ -31,9 +31,53 @@ document.addEventListener('DOMContentLoaded', function() {
         updateBodyVisibility();
     }
     
+    function updateMoonOrbits() {
+        document.querySelectorAll('.celestial-body.moon').forEach(moon => {
+            const parentBody = moon.dataset.parentBody;
+            if (!parentBody) return;
+            
+            const parentElement = document.querySelector(`.${parentBody.toLowerCase()}`);
+            if (!parentElement) return;
+            
+            const parentDiameter = parseFloat(parentElement.style.width);
+            let orbitRadius = parseFloat(moon.dataset.orbitRadius || 0);
+            
+            const minRadius = parentDiameter * 0.7;
+            orbitRadius = Math.max(orbitRadius, minRadius);
+            moon.dataset.adjustedRadius = orbitRadius;
+            
+            const orbit = parentElement.querySelector(`.moon-orbit[data-moon="${moon.getAttribute('data-name')}"]`);
+            if (orbit) {
+                orbit.style.width = `${orbitRadius * 2}px`;
+                orbit.style.height = `${orbitRadius * 2}px`;
+                orbit.style.left = `${(parentDiameter - orbitRadius * 2) / 2}px`;
+                orbit.style.top = `${(parentDiameter - orbitRadius * 2) / 2}px`;
+            }
+        });
+    }
+    
     function updateBodyVisibility() {
+        const visiblePlanets = [];
+        const visibleMoons = {};
+        
         document.querySelectorAll('.celestial-body').forEach(body => {
             const bodyType = body.getAttribute('data-body-type');
+            const bodyName = body.getAttribute('data-name');
+            
+            if (bodyType === 'planet' || bodyType === 'star') {
+                visiblePlanets.push(bodyName);
+            } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
+                const parentBody = body.dataset.parentBody;
+                if (!visibleMoons[parentBody]) {
+                    visibleMoons[parentBody] = [];
+                }
+                visibleMoons[parentBody].push(bodyName);
+            }
+        });
+        
+        document.querySelectorAll('.celestial-body').forEach(body => {
+            const bodyType = body.getAttribute('data-body-type');
+            const bodyName = body.getAttribute('data-name');
             const tooltip = body.querySelector('.tooltip');
             
             let scaleFactor = 1;
@@ -50,18 +94,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (tooltip) {
                 tooltip.style.transform = `scale(${1/currentZoom})`;
-                
-                if (bodyType === 'planet' || 
-                   (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) ||
-                   (bodyType === 'star')) {
-                    tooltip.style.display = 'block';
-                } else {
-                    tooltip.style.display = 'none';
-                }
+                tooltip.style.display = 'none';
             }
             
-            if (bodyType === 'planet' || bodyType === 'star' || 
-               (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon)) {
+            if (bodyType === 'planet' || bodyType === 'star') {
+                body.style.display = 'block';
+            } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
                 body.style.display = 'block';
             } else {
                 body.style.display = 'none';
@@ -88,6 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 orbit.style.display = 'none';
             }
         });
+        
+        updateMoonOrbits();
     }
     
     function updateZoomDisplay() {
@@ -485,12 +525,16 @@ document.addEventListener('DOMContentLoaded', function() {
             element.style.height = `${body.diameter}px`;
             element.style.zIndex = 60;
 
+            let orbitRadius = body.orbitRadius;
             if (body.parentBody === "Saturn") {
-                body.orbitRadius = Math.max(body.orbitRadius, parentDiameter * 1.2);
+                orbitRadius = Math.max(body.orbitRadius, parentDiameter * 0.8);
+            } else {
+                orbitRadius = Math.max(body.orbitRadius, parentDiameter * 0.7);
             }
+            body.orbitRadius = orbitRadius;
 
-            const moonX = body.orbitRadius * Math.cos(angle);
-            const moonY = body.orbitRadius * Math.sin(angle);
+            const moonX = orbitRadius * Math.cos(angle);
+            const moonY = orbitRadius * Math.sin(angle);
             element.style.left = `${(parentDiameter - body.diameter) / 2 + moonX}px`;
             element.style.top = `${(parentDiameter - body.diameter) / 2 + moonY}px`;
             
@@ -509,10 +553,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const orbit = document.createElement('div');
             orbit.className = 'moon-orbit';
-            orbit.style.width = `${body.orbitRadius * 2}px`;
-            orbit.style.height = `${body.orbitRadius * 2}px`;
-            orbit.style.left = `${(parentDiameter - body.orbitRadius * 2) / 2}px`;
-            orbit.style.top = `${(parentDiameter - body.orbitRadius * 2) / 2}px`;
+            orbit.setAttribute('data-moon', body.name);
+            orbit.style.width = `${orbitRadius * 2}px`;
+            orbit.style.height = `${orbitRadius * 2}px`;
+            orbit.style.left = `${(parentDiameter - orbitRadius * 2) / 2}px`;
+            orbit.style.top = `${(parentDiameter - orbitRadius * 2) / 2}px`;
             orbit.style.borderColor = 'rgba(255, 255, 255, 0.25)';
             
             if (body.inclination) {
@@ -531,10 +576,31 @@ document.addEventListener('DOMContentLoaded', function() {
             
             element.dataset.angle = angle;
             element.dataset.orbitSpeed = body.orbitSpeed;
-            element.dataset.orbitRadius = body.orbitRadius;
+            element.dataset.orbitRadius = orbitRadius;
+            element.dataset.adjustedRadius = orbitRadius;
             element.dataset.parentBody = body.parentBody;
             
             console.log(`Created moon ${body.name} orbiting ${body.parentBody} at relative position:`, moonX, moonY);
+        });
+        
+        document.querySelectorAll('.celestial-body').forEach(body => {
+            body.addEventListener('mouseenter', function() {
+                document.querySelectorAll('.tooltip').forEach(t => {
+                    t.style.display = 'none';
+                });
+                
+                const tooltip = this.querySelector('.tooltip');
+                if (tooltip) {
+                    tooltip.style.display = 'block';
+                }
+            });
+            
+            body.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.tooltip');
+                if (tooltip) {
+                    tooltip.style.display = 'none';
+                }
+            });
         });
         
         createAsteroidBelt();
@@ -607,7 +673,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.celestial-body.moon').forEach(moon => {
             let angle = parseFloat(moon.dataset.angle || 0);
             const speed = parseFloat(moon.dataset.orbitSpeed || 0);
-            const radius = parseFloat(moon.dataset.orbitRadius || 0);
+            const radius = parseFloat(moon.dataset.adjustedRadius || moon.dataset.orbitRadius || 0);
             
             angle += (0.0005 * speed * deltaTime);
             if (angle > Math.PI * 2) angle -= Math.PI * 2;
@@ -691,94 +757,114 @@ document.addEventListener('DOMContentLoaded', function() {
         isDragging = false;
     });
     
-    document.addEventListener('wheel', function(e) {
-        e.preventDefault();
+   document.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    
+    const rect = document.getElementById('universe').getBoundingClientRect();
+    const mouseX = e.clientX - rect.left - (rect.width / 2);
+    const mouseY = e.clientY - rect.top - (rect.height / 2);
+    
+    const oldZoom = currentZoom;
+    
+    if (e.deltaY < 0) {
+        currentZoom = Math.min(currentZoom * 1.1, maxZoom);
+    } else {
+        currentZoom = Math.max(currentZoom * 0.9, minZoom);
+    }
+    
+    const zoomChange = currentZoom / oldZoom;
+    
+    currentX = mouseX + (currentX - mouseX) * zoomChange;
+    currentY = mouseY + (currentY - mouseY) * zoomChange;
+    
+    updateTransform();
+}, { passive: false });
+
+let touchStartX, touchStartY, touchStartDist;
+
+solarSystem.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 1) {
+        isDragging = true;
+        startDragX = e.touches[0].clientX - currentX;
+        startDragY = e.touches[0].clientY - currentY;
+    } else if (e.touches.length === 2) {
+        isDragging = false;
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        touchStartDist = Math.sqrt(dx * dx + dy * dy);
+    }
+    e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 1 && isDragging) {
+        currentX = e.touches[0].clientX - startDragX;
+        currentY = e.touches[0].clientY - startDragY;
         
-        const rect = document.getElementById('universe').getBoundingClientRect();
-        const mouseX = e.clientX - rect.left - (rect.width / 2);
-        const mouseY = e.clientY - rect.top - (rect.height / 2);
-        
-        const oldZoom = currentZoom;
-        
-        if (e.deltaY < 0) {
-            currentZoom = Math.min(currentZoom * 1.1, maxZoom);
-        } else {
-            currentZoom = Math.max(currentZoom * 0.9, minZoom);
-        }
-        
-        const zoomChange = currentZoom / oldZoom;
-        
-        currentX = mouseX + (currentX - mouseX) * zoomChange;
-        currentY = mouseY + (currentY - mouseY) * zoomChange;
+        const maxPan = 1500;
+        currentX = Math.max(Math.min(currentX, maxPan), -maxPan);
+        currentY = Math.max(Math.min(currentY, maxPan), -maxPan);
         
         updateTransform();
-    }, { passive: false });
-    
-    let touchStartX, touchStartY, touchStartDist;
-    
-    solarSystem.addEventListener('touchstart', function(e) {
-        if (e.touches.length === 1) {
-            isDragging = true;
-            startDragX = e.touches[0].clientX - currentX;
-            startDragY = e.touches[0].clientY - currentY;
-        } else if (e.touches.length === 2) {
-            isDragging = false;
-            const dx = e.touches[0].clientX - e.touches[1].clientX;
-            const dy = e.touches[0].clientY - e.touches[1].clientY;
-            touchStartDist = Math.sqrt(dx * dx + dy * dy);
-        }
-        e.preventDefault();
-    }, { passive: false });
-    
-    document.addEventListener('touchmove', function(e) {
-        if (e.touches.length === 1 && isDragging) {
-            currentX = e.touches[0].clientX - startDragX;
-            currentY = e.touches[0].clientY - startDragY;
-            
-            const maxPan = 1500;
-            currentX = Math.max(Math.min(currentX, maxPan), -maxPan);
-            currentY = Math.max(Math.min(currentY, maxPan), -maxPan);
-            
+    } else if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const newDist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (touchStartDist) {
+            const zoomFactor = newDist / touchStartDist;
+            currentZoom = Math.min(Math.max(currentZoom * zoomFactor, minZoom), maxZoom);
+            touchStartDist = newDist;
             updateTransform();
-        } else if (e.touches.length === 2) {
-            const dx = e.touches[0].clientX - e.touches[1].clientX;
-            const dy = e.touches[0].clientY - e.touches[1].clientY;
-            const newDist = Math.sqrt(dx * dx + dy * dy);
-            
-            if (touchStartDist) {
-                const zoomFactor = newDist / touchStartDist;
-                currentZoom = Math.min(Math.max(currentZoom * zoomFactor, minZoom), maxZoom);
-                touchStartDist = newDist;
-                updateTransform();
-            }
         }
-        e.preventDefault();
-    }, { passive: false });
-    
-    document.addEventListener('touchend', function(e) {
-        if (e.touches.length < 1) {
-            isDragging = false;
-        }
-        if (e.touches.length !== 2) {
-            touchStartDist = null;
+    }
+    e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchend', function(e) {
+    if (e.touches.length < 1) {
+        isDragging = false;
+    }
+    if (e.touches.length !== 2) {
+        touchStartDist = null;
+    }
+});
+
+document.querySelectorAll('.celestial-body').forEach(body => {
+    body.addEventListener('mouseenter', function() {
+        document.querySelectorAll('.tooltip').forEach(t => {
+            t.style.display = 'none';
+        });
+        
+        const tooltip = this.querySelector('.tooltip');
+        if (tooltip) {
+            tooltip.style.display = 'block';
         }
     });
     
-    createCelestialBodies();
-    requestAnimationFrame(animateCelestialBodies);
-    
-    const infoPanel = document.getElementById('info-panel');
-    if (infoPanel && infoPanel.querySelector('h2')) {
-        infoPanel.querySelector('h2').textContent = 'Sol';
-    }
-    
-    const loadingScreen = document.getElementById('loading');
-    if (loadingScreen) {
-        loadingScreen.style.opacity = '0';
-        setTimeout(() => {
-            loadingScreen.style.display = 'none';
-        }, 500);
-    }
-    
-    console.log("Initialization complete");
+    body.addEventListener('mouseleave', function() {
+        const tooltip = this.querySelector('.tooltip');
+        if (tooltip) {
+            tooltip.style.display = 'none';
+        }
+    });
+});
+
+createCelestialBodies();
+requestAnimationFrame(animateCelestialBodies);
+
+const infoPanel = document.getElementById('info-panel');
+if (infoPanel && infoPanel.querySelector('h2')) {
+    infoPanel.querySelector('h2').textContent = 'Sol';
+}
+
+const loadingScreen = document.getElementById('loading');
+if (loadingScreen) {
+    loadingScreen.style.opacity = '0';
+    setTimeout(() => {
+        loadingScreen.style.display = 'none';
+    }, 500);
+}
+
+console.log("Initialization complete");
 });
