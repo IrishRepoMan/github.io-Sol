@@ -18,12 +18,15 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
 function updateTransform() {
+    const zoomPointX = zoomTarget.x || 0;
+    const zoomPointY = zoomTarget.y || 0;
+    
     // Apply boundaries to prevent moving off-screen
     const maxPan = 2500 * (1 - currentZoom);
     currentX = Math.max(Math.min(currentX, maxPan), -maxPan);
     currentY = Math.max(Math.min(currentY, maxPan), -maxPan);
     
-    solarSystem.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentZoom})`;
+    solarSystem.style.transform = `translate(calc(${currentX + zoomPointX}px - 50%), calc(${currentY + zoomPointY}px - 50%)) scale(${currentZoom})`;
     
     document.getElementById('solar-system').style.visibility = 'visible';
     document.getElementById('solar-system').style.opacity = '1';
@@ -34,35 +37,29 @@ function updateTransform() {
 }
     
   function updateMoonOrbits() {
-    document.querySelectorAll('.celestial-body.moon').forEach(moon => {
-        const parentBody = moon.dataset.parentBody;
-        if (!parentBody) return;
-        
-        const parentElement = document.querySelector(`.${parentBody.toLowerCase()}`);
-        if (!parentElement) return;
-        
-        const parentDiameter = parseFloat(parentElement.style.width);
-        const moonDiameter = parseFloat(moon.style.width);
-        
-        // Calculate minimum orbit distance (outside the parent planet)
-        let minOrbitRadius = parentDiameter / 2 + moonDiameter / 2 + 5; // Adding 5px padding
-        
-        // Get the base orbit radius
-        let orbitRadius = parseFloat(moon.dataset.orbitRadius || 0);
-        
-        // Ensure orbit is outside the parent planet
-        orbitRadius = Math.max(orbitRadius, minOrbitRadius);
-        moon.dataset.adjustedRadius = orbitRadius;
-        
-        // Update moon orbit display
-        const orbit = parentElement.querySelector(`.moon-orbit[data-moon="${moon.getAttribute('data-name')}"]`);
-        if (orbit) {
-            orbit.style.width = `${orbitRadius * 2}px`;
-            orbit.style.height = `${orbitRadius * 2}px`;
-            orbit.style.left = `${(parentDiameter - orbitRadius * 2) / 2}px`;
-            orbit.style.top = `${(parentDiameter - orbitRadius * 2) / 2}px`;
-        }
-    });
+   document.querySelectorAll('.celestial-body.moon').forEach(moon => {
+    let angle = parseFloat(moon.dataset.angle || 0);
+    const speed = parseFloat(moon.dataset.orbitSpeed || 0);
+    const radius = parseFloat(moon.dataset.adjustedRadius || moon.dataset.orbitRadius || 0);
+    
+    angle += (0.0005 * speed * deltaTime);
+    if (angle > Math.PI * 2) angle -= Math.PI * 2;
+    moon.dataset.angle = angle;
+    
+    const parentElement = moon.parentElement;
+    if (!parentElement) return;
+    
+    const diameter = parseFloat(moon.style.width);
+    const parentDiameter = parseFloat(parentElement.style.width);
+    
+    // Calculate position based on orbit radius and angle
+    const moonX = radius * Math.cos(angle);
+    const moonY = radius * Math.sin(angle);
+    
+    // Position centered on parent and offset by orbit
+    moon.style.left = `${(parentDiameter - diameter) / 2 + moonX}px`;
+    moon.style.top = `${(parentDiameter - diameter) / 2 + moonY}px`;
+});
 }
     
     function updateBodyVisibility() {
@@ -498,14 +495,13 @@ element.addEventListener('click', function() {
 
 // Replace around line 257-271 in script.js
 element.addEventListener('mouseenter', function(e) {
-    // Hide all other tooltips first
-    document.querySelectorAll('.tooltip').forEach(t => {
-        t.style.display = 'none';
-    });
-    
-    // Show only this tooltip
     const tooltip = this.querySelector('.tooltip');
     if (tooltip) {
+        // Hide all other tooltips first
+        document.querySelectorAll('.tooltip').forEach(t => {
+            if (t !== tooltip) t.style.display = 'none';
+        });
+        
         tooltip.style.display = 'block';
         tooltip.style.transform = `scale(${1/currentZoom})`;
     }
@@ -802,9 +798,13 @@ document.addEventListener('wheel', function(e) {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     
-    // Calculate point to zoom towards (relative to transform origin)
-    zoomTarget.x = (mouseX - rect.width / 2) * (1 - currentZoom) / currentZoom;
-    zoomTarget.y = (mouseY - rect.height / 2) * (1 - currentZoom) / currentZoom;
+    // Convert to solar system coordinates
+    const containerCenterX = rect.width / 2;
+    const containerCenterY = rect.height / 2;
+    
+    // Calculate point to zoom towards (relative to center)
+    const targetX = (mouseX - containerCenterX) / currentZoom;
+    const targetY = (mouseY - containerCenterY) / currentZoom;
     
     const oldZoom = currentZoom;
     
@@ -814,10 +814,10 @@ document.addEventListener('wheel', function(e) {
         currentZoom = Math.max(currentZoom * 0.9, minZoom);
     }
     
-    // Adjust target to maintain position under cursor
-    const zoomRatio = currentZoom / oldZoom;
-    zoomTarget.x = zoomTarget.x * zoomRatio;
-    zoomTarget.y = zoomTarget.y * zoomRatio;
+    // Adjust position to zoom toward cursor
+    const scaleFactor = currentZoom / oldZoom - 1;
+    currentX -= targetX * scaleFactor;
+    currentY -= targetY * scaleFactor;
     
     updateTransform();
 }, { passive: false });
