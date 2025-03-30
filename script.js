@@ -440,6 +440,269 @@ function updateTransform() {
             type: "moon",
             inclination: 0.05
         }
+        {
+    name: "Phobos",
+    diameter: 6,
+    orbitRadius: 18,
+    orbitSpeed: 3,
+    parentBody: "Mars",
+    color: "#aaaaaa",
+    description: "Mars' larger moon, now home to orbital transfer stations and habitat construction facilities.",
+    type: "moon",
+    inclination: 0.04
+},
+{
+    name: "Deimos",
+    diameter: 4,
+    orbitRadius: 26,
+    orbitSpeed: 2,
+    parentBody: "Mars",
+    color: "#999999",
+    description: "Mars' smaller moon, hosting observatories and communication relay stations.",
+    type: "moon",
+    inclination: 0.07
+},
+
+// Additional moons of Jupiter
+{
+    name: "Amalthea",
+    diameter: 5,
+    orbitRadius: 25,
+    orbitSpeed: 2.2,
+    parentBody: "Jupiter",
+    color: "#b35900",
+    description: "A small, irregularly shaped inner moon of Jupiter with a reddish appearance.",
+    type: "moon",
+    inclination: 0.04
+},
+{
+    name: "Himalia",
+    diameter: 6,
+    orbitRadius: 85,
+    orbitSpeed: 0.7,
+    parentBody: "Jupiter",
+    color: "#888888",
+    description: "The largest member of Jupiter's irregular satellite group.",
+    type: "moon",
+    inclination: 0.06
+},
+{
+    name: "Thebe",
+    diameter: 4,
+    orbitRadius: 28,
+    orbitSpeed: 2.0,
+    parentBody: "Jupiter",
+    color: "#a9a9a9",
+    description: "A small inner moon of Jupiter, heavily cratered from impacts.",
+    type: "moon",
+    inclination: 0.05
+},
+{
+    name: "Metis",
+    diameter: 3,
+    orbitRadius: 22,
+    orbitSpeed: 2.5,
+    parentBody: "Jupiter",
+    color: "#a0a0a0",
+    description: "Jupiter's innermost known moon, orbiting close to the planet's cloud tops.",
+    type: "moon",
+    inclination: 0.03
+},
+
+// Additional moons of Saturn
+{
+    name: "Mimas",
+    diameter: 8,
+    orbitRadius: 30,
+    orbitSpeed: 1.5,
+    parentBody: "Saturn",
+    color: "#e6e6e6",
+    description: "Saturn's 'Death Star' moon with a distinctive large crater.",
+    type: "moon",
+    inclination: 0.04
+},
+{
+    name: "Tethys",
+    diameter: 9,
+    orbitRadius: 40,
+    orbitSpeed: 1.3,
+    parentBody: "Saturn",
+    color: "#f2f2f2",
+    description: "An icy moon with a large crater and a massive canyon system.",
+    type: "moon",
+    inclination: 0.05
+},
+{
+    name: "Dione",
+    diameter: 9,
+    orbitRadius: 50,
+    orbitSpeed: 1.0,
+    parentBody: "Saturn",
+    color: "#e6e6e6",
+    description: "An icy moon with bright cliffs and a variety of terrains.",
+    type: "moon",
+    inclination: 0.04
+},
+{
+    name: "Iapetus",
+    diameter: 10,
+    orbitRadius: 70,
+    orbitSpeed: 0.7,
+    parentBody: "Saturn",
+    color: "#b3b3b3",
+    description: "Saturn's two-toned moon with one dark and one light hemisphere.",
+    type: "moon",
+    inclination: 0.08
+},
+{
+    name: "Hyperion",
+    diameter: 6,
+    orbitRadius: 65,
+    orbitSpeed: 0.8,
+    parentBody: "Saturn",
+    color: "#c2c2c2",
+    description: "A chaotically tumbling moon with a sponge-like appearance.",
+    type: "moon",
+    inclination: 0.07
+},
+
+// Additional moons of Uranus
+{
+    name: "Ariel",
+    diameter: 9,
+    orbitRadius: 50,
+    orbitSpeed: 1.0,
+    parentBody: "Uranus",
+    color: "#a3c2d5",
+    description: "One of Uranus's five major moons, with a relatively young surface.",
+    type: "moon",
+    inclination: 0.04
+},
+{
+    name: "Umbriel",
+    diameter: 9,
+    orbitRadius: 55,
+    orbitSpeed: 0.9,
+    parentBody: "Uranus",
+    color: "#808c99",
+    description: "One of Uranus's darkest moons with an ancient, heavily cratered surface.",
+    type: "moon",
+    inclination: 0.05
+},
+{
+    name: "Oberon",
+    diameter: 11,
+    orbitRadius: 60,
+    orbitSpeed: 0.8,
+    parentBody: "Uranus",
+    color: "#93a3b3",
+    description: "The outermost of Uranus's major moons, with an old, cratered surface.",
+    type: "moon",
+    inclination: 0.06
+},
+{
+    name: "Puck",
+    diameter: 4,
+    orbitRadius: 25,
+    orbitSpeed: 1.4,
+    parentBody: "Uranus",
+    color: "#a5b5c5",
+    description: "A small inner moon of Uranus discovered by Voyager 2.",
+    type: "moon",
+    inclination: 0.03
+},
+
+// Additional moons of Neptune
+{
+    name: "Nereid",
+    diameter: 5,
+    orbitRadius: 55,
+    orbitSpeed: 0.7,
+    parentBody: "Neptune",
+    color: "#b3c6d9",
+    description: "Neptune's third-largest moon with a highly eccentric orbit.",
+    type: "moon",
+    inclination: 0.07
+},
+{
+    name: "Larissa",
+    diameter: 5,
+    orbitRadius: 30,
+    orbitSpeed: 1.3,
+    parentBody: "Neptune",
+    color: "#8faabf",
+    description: "An irregularly shaped inner moon of Neptune.",
+    type: "moon",
+    inclination: 0.04
+},
+{
+    name: "Naiad",
+    diameter: 3,
+    orbitRadius: 20,
+    orbitSpeed: 1.8,
+    parentBody: "Neptune",
+    color: "#8aa6bf",
+    description: "The innermost satellite of Neptune, orbiting within the planet's ring system.",
+    type: "moon",
+    inclination: 0.03
+},
+{
+    name: "Thalassa",
+    diameter: 4,
+    orbitRadius: 22,
+    orbitSpeed: 1.6,
+    parentBody: "Neptune",
+    color: "#8da9c2",
+    description: "A small inner moon of Neptune discovered by Voyager 2.",
+    type: "moon",
+    inclination: 0.03
+},
+
+// Additional moons of Pluto
+{
+    name: "Nix",
+    diameter: 3,
+    orbitRadius: 18,
+    orbitSpeed: 1.0,
+    parentBody: "Pluto",
+    color: "#ccbdb3",
+    description: "A small, irregularly shaped moon of Pluto.",
+    type: "moon",
+    inclination: 0.04
+},
+{
+    name: "Hydra",
+    diameter: 3,
+    orbitRadius: 23,
+    orbitSpeed: 0.8,
+    parentBody: "Pluto",
+    color: "#ccc3bb",
+    description: "The outermost known moon of Pluto.",
+    type: "moon",
+    inclination: 0.03
+},
+{
+    name: "Kerberos",
+    diameter: 2,
+    orbitRadius: 20,
+    orbitSpeed: 0.9,
+    parentBody: "Pluto",
+    color: "#c1b6ae",
+    description: "A small moon of Pluto discovered in 2011.",
+    type: "moon",
+    inclination: 0.04
+},
+{
+    name: "Styx",
+    diameter: 2,
+    orbitRadius: 16,
+    orbitSpeed: 1.1,
+    parentBody: "Pluto",
+    color: "#c9bfb7",
+    description: "The innermost moon of Pluto, and the last to be discovered.",
+    type: "moon",
+    inclination: 0.03
+}
     ];
     
     const systemCenter = {
