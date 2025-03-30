@@ -15,7 +15,11 @@ let currentZoom = 0.2; // This is now the minimum zoom (fully zoomed out)
         moon: 0.3,
         asteroid: 0.4,
         installation: 0.6
-    };
+        let animationFrameId = null;
+let lastFrameTime = 0;
+const TARGET_FPS = 60;
+const FRAME_INTERVAL = 1000 / TARGET_FPS;
+};
     
 function updateTransform() {
     // Only allow panning when zoomed in beyond minimum level
@@ -92,11 +96,41 @@ function updateTransform() {
    function updateBodyVisibility() {
     const visiblePlanets = [];
     const visibleMoons = {};
-    
-    document.querySelectorAll('.celestial-body').forEach(body => {
+     const visibleRadius = 1800 / currentZoom;
+       
+   document.querySelectorAll('.celestial-body').forEach(body => {
         const bodyType = body.getAttribute('data-body-type');
         const bodyName = body.getAttribute('data-name');
+
+        if (bodyName === "Sol") {
+            body.style.display = 'block';
+            return;
+        }
         
+        // For other bodies, check distance from center of view
+        if (bodyType === 'planet') {
+            // Calculate distance from current view center
+            const bodyX = parseFloat(body.style.left) + parseFloat(body.style.width) / 2;
+            const bodyY = parseFloat(body.style.top) + parseFloat(body.style.height) / 2;
+            const viewCenterX = systemCenter.x + currentX;
+            const viewCenterY = systemCenter.y + currentY;
+            
+            const distance = Math.sqrt(
+                Math.pow(bodyX - viewCenterX, 2) + 
+                Math.pow(bodyY - viewCenterY, 2)
+            );
+            
+            // Hide if too far from current view center and zoomed in
+            if (currentZoom > 0.3 && distance > visibleRadius) {
+                body.style.display = 'none';
+            } else {
+                body.style.display = 'block';
+            }
+        } else if (bodyType === 'moon') {
+            // Show moons only at sufficient zoom level
+            body.style.display = currentZoom >= bodyVisibilityThresholds.moon ? 'block' : 'none';
+        }
+       
         if (bodyType === 'planet' || bodyType === 'star') {
             visiblePlanets.push(bodyName);
         } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
@@ -708,6 +742,46 @@ function updateTransform() {
         
         celestialBodies.forEach(body => {
             if (body.parentBody) return;
+
+            // Add this to the createCelestialBodies function, inside the planet creation loop
+if (body.type === 'planet') {
+    // Add texture gradient based on planet type
+    if (body.name === "Mercury") {
+        bodyContent.style.background = "linear-gradient(30deg, #6e6e6e, #a6a6a6, #d4d4d4)";
+    } else if (body.name === "Venus") {
+        bodyContent.style.background = "linear-gradient(30deg, #a57c1b, #e6e600, #ffffcc)";
+    } else if (body.name === "Earth") {
+        bodyContent.style.background = "linear-gradient(30deg, #1a5599, #3399ff, #66ccff)";
+    } else if (body.name === "Mars") {
+        bodyContent.style.background = "linear-gradient(30deg, #992900, #ff6600, #ff9966)";
+    } else if (body.name === "Jupiter") {
+        bodyContent.style.background = "linear-gradient(30deg, #a67c52, #d4a876, #e6c699)";
+    } else if (body.name === "Saturn") {
+        bodyContent.style.background = "linear-gradient(30deg, #b39766, #d4c099, #e6d4b3)";
+    } else if (body.name === "Uranus") {
+        bodyContent.style.background = "linear-gradient(30deg, #5dacee, #77ccff, #aaddff)";
+    } else if (body.name === "Neptune") {
+        bodyContent.style.background = "linear-gradient(30deg, #3355bb, #5577dd, #7799ff)";
+    } else if (body.name === "Pluto") {
+        bodyContent.style.background = "linear-gradient(30deg, #9a7c5c, #b39980, #ccb399)";
+    }
+    
+    // Add a subtle shadow glow
+    element.style.boxShadow = `0 0 15px rgba(${hexToRgb(body.color)}, 0.7)`;
+}
+            // Improve ring appearance
+if (body.hasRings) {
+    const rings = document.createElement('div');
+    rings.className = 'planet-rings';
+    rings.style.width = `${body.diameter * 2.2}px`;
+    rings.style.height = `${body.ringWidth}px`;
+    rings.style.backgroundColor = body.ringColor;
+    rings.style.left = `${-body.diameter * 0.6}px`;
+    rings.style.top = `${(body.diameter - body.ringWidth) / 2}px`;
+    rings.style.boxShadow = `0 0 10px rgba(255, 255, 255, 0.3)`;
+    rings.style.border = '1px solid rgba(255, 255, 255, 0.4)';
+    element.appendChild(rings);
+}
             
             if (body.name === "Sol") {
                 const sunElement = document.querySelector('.sun');
@@ -763,20 +837,22 @@ function updateTransform() {
             });
             
             // Add hover events for tooltips
-            element.addEventListener('mouseenter', function(e) {
-                // Hide all other tooltips
-                document.querySelectorAll('.tooltip').forEach(t => {
-                    t.style.display = 'none';
-                });
-                
-                // Show only this tooltip
-                const tooltip = this.querySelector('.tooltip');
-                if (tooltip) {
-                    tooltip.style.display = 'block';
-                    tooltip.style.transform = `scale(${1/currentZoom})`;
-                }
-                e.stopPropagation();
-            });
+           element.addEventListener('mouseenter', function(e) {
+    // Stop propagation to parent elements
+    e.stopPropagation();
+    
+    // Hide all tooltips first
+    document.querySelectorAll('.tooltip').forEach(t => {
+        t.style.display = 'none';
+    });
+    
+    // Show only this tooltip
+    const tooltip = this.querySelector('.tooltip');
+    if (tooltip) {
+        tooltip.style.display = 'block';
+        tooltip.style.transform = `scale(${1/currentZoom})`;
+    }
+});
             
             element.addEventListener('mouseleave', function() {
                 const tooltip = this.querySelector('.tooltip');
@@ -903,49 +979,55 @@ function updateTransform() {
     }
     
     function createAsteroidBelt() {
-        console.log("Creating asteroid belt...");
+    console.log("Creating asteroid belt...");
+    
+    const beltContainer = document.createElement('div');
+    beltContainer.className = 'asteroid-belt';
+    
+    const asteroidCount = 300;
+    const minRadius = 750;
+    const maxRadius = 850;
+     const fragment = document.createDocumentFragment();
+    
+    for (let i = 0; i < asteroidCount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = minRadius + Math.random() * (maxRadius - minRadius);
+        const size = 1.5 + Math.random() * 3.5;
         
-        const beltContainer = document.createElement('div');
-        beltContainer.className = 'asteroid-belt';
+        const x = systemCenter.x + Math.cos(angle) * radius;
+        const y = systemCenter.y + Math.sin(angle) * radius;
         
-        const asteroidCount = 300;
-        const minRadius = 750;
-        const maxRadius = 850;
+        const asteroid = document.createElement('div');
+        asteroid.className = 'asteroid';
+        asteroid.style.width = `${size}px`;
+        asteroid.style.height = `${size}px`;
+        asteroid.style.left = `${x - size/2}px`;
+        asteroid.style.top = `${y - size/2}px`;
         
-        for (let i = 0; i < asteroidCount; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const radius = minRadius + Math.random() * (maxRadius - minRadius);
-            const size = 1.5 + Math.random() * 3.5;
-            
-            const x = systemCenter.x + Math.cos(angle) * radius;
-            const y = systemCenter.y + Math.sin(angle) * radius;
-            
-            const asteroid = document.createElement('div');
-            asteroid.className = 'asteroid';
-            asteroid.style.width = `${size}px`;
-            asteroid.style.height = `${size}px`;
-            asteroid.style.left = `${x - size/2}px`;
-            asteroid.style.top = `${y - size/2}px`;
-            
-            const brightness = 150 + Math.floor(Math.random() * 105);
-            asteroid.style.backgroundColor = `rgba(${brightness}, ${brightness}, ${brightness}, 0.9)`;
-            asteroid.style.boxShadow = `0 0 2px rgba(255, 255, 255, 0.7)`;
-            
-            asteroid.dataset.angle = angle;
-            asteroid.dataset.radius = radius;
-            asteroid.dataset.orbitSpeed = 0.04 + Math.random() * 0.08;
-            
-            beltContainer.appendChild(asteroid);
-        }
+        const brightness = 150 + Math.floor(Math.random() * 105);
+        asteroid.style.backgroundColor = `rgba(${brightness}, ${brightness}, ${brightness}, 0.9)`;
+        asteroid.style.boxShadow = `0 0 2px rgba(255, 255, 255, 0.7)`;
         
-        solarSystem.appendChild(beltContainer);
-        console.log("Asteroid belt created with", asteroidCount, "asteroids");
+        asteroid.dataset.angle = angle;
+        asteroid.dataset.radius = radius;
+        asteroid.dataset.orbitSpeed = 0.04 + Math.random() * 0.08;
+        
+        fragment.appendChild(asteroid);
     }
     
+    beltContainer.appendChild(fragment);
+    solarSystem.appendChild(beltContainer);
+    console.log("Asteroid belt created with", asteroidCount, "asteroids");
+}
+    
     function animateCelestialBodies(timestamp) {
-        if (!lastTime) lastTime = timestamp;
-        const deltaTime = (timestamp - lastTime) / 16.67;
-        lastTime = timestamp;
+    animationFrameId = requestAnimationFrame(animateCelestialBodies);
+    
+    // Throttle updates based on target frame rate
+    if (timestamp - lastFrameTime < FRAME_INTERVAL) {
+        return;
+    }
+    lastFrameTime = timestamp;
         
         document.querySelectorAll('.celestial-body:not(.moon)').forEach(element => {
             if (element.getAttribute('data-name') === 'Sol') return;
