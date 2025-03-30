@@ -17,21 +17,23 @@ document.addEventListener('DOMContentLoaded', function() {
         installation: 0.6
     };
     
-    function updateTransform() {
-        const zoomPointX = zoomTarget.x || 0;
-        const zoomPointY = zoomTarget.y || 0;
-        
-        solarSystem.style.transform = `translate(calc(${currentX + zoomPointX}px - 50%), calc(${currentY + zoomPointY}px - 50%)) scale(${currentZoom})`;
-        
-        document.getElementById('solar-system').style.visibility = 'visible';
-        document.getElementById('solar-system').style.opacity = '1';
-        document.getElementById('universe').style.backgroundColor = '#000';
-
-        updateZoomDisplay();
-        updateBodyVisibility();
-    }
+function updateTransform() {
+    // Apply boundaries to prevent moving off-screen
+    const maxPan = 2500 * (1 - currentZoom);
+    currentX = Math.max(Math.min(currentX, maxPan), -maxPan);
+    currentY = Math.max(Math.min(currentY, maxPan), -maxPan);
     
-   function updateMoonOrbits() {
+    solarSystem.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentZoom})`;
+    
+    document.getElementById('solar-system').style.visibility = 'visible';
+    document.getElementById('solar-system').style.opacity = '1';
+    document.getElementById('universe').style.backgroundColor = '#000';
+
+    updateZoomDisplay();
+    updateBodyVisibility();
+}
+    
+  function updateMoonOrbits() {
     document.querySelectorAll('.celestial-body.moon').forEach(moon => {
         const parentBody = moon.dataset.parentBody;
         if (!parentBody) return;
@@ -494,7 +496,7 @@ element.addEventListener('click', function() {
     window.location.href = `detail.html?body=${body.name.toLowerCase()}`;
 });
 
-// Add hover events for tooltips
+// Replace around line 257-271 in script.js
 element.addEventListener('mouseenter', function(e) {
     // Hide all other tooltips first
     document.querySelectorAll('.tooltip').forEach(t => {
@@ -791,7 +793,8 @@ element.addEventListener('mouseleave', function() {
         isDragging = false;
     });
     
-   document.addEventListener('wheel', function(e) {
+   // Replace around line 323-352 in script.js
+document.addEventListener('wheel', function(e) {
     e.preventDefault();
     
     // Get mouse position relative to the universe element
@@ -799,13 +802,9 @@ element.addEventListener('mouseleave', function() {
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     
-    // Convert to solar system coordinates
-    const containerCenterX = rect.width / 2;
-    const containerCenterY = rect.height / 2;
-    
-    // Calculate point to zoom towards (relative to center)
-    const targetX = (mouseX - containerCenterX) / currentZoom;
-    const targetY = (mouseY - containerCenterY) / currentZoom;
+    // Calculate point to zoom towards (relative to transform origin)
+    zoomTarget.x = (mouseX - rect.width / 2) * (1 - currentZoom) / currentZoom;
+    zoomTarget.y = (mouseY - rect.height / 2) * (1 - currentZoom) / currentZoom;
     
     const oldZoom = currentZoom;
     
@@ -815,14 +814,13 @@ element.addEventListener('mouseleave', function() {
         currentZoom = Math.max(currentZoom * 0.9, minZoom);
     }
     
-    // Adjust position to zoom toward cursor
-    const scaleFactor = currentZoom / oldZoom - 1;
-    currentX -= targetX * scaleFactor;
-    currentY -= targetY * scaleFactor;
+    // Adjust target to maintain position under cursor
+    const zoomRatio = currentZoom / oldZoom;
+    zoomTarget.x = zoomTarget.x * zoomRatio;
+    zoomTarget.y = zoomTarget.y * zoomRatio;
     
     updateTransform();
 }, { passive: false });
-
 let touchStartX, touchStartY, touchStartDist;
 
 solarSystem.addEventListener('touchstart', function(e) {
