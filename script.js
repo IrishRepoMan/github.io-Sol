@@ -72,78 +72,84 @@ function updateTransform() {
         });
     }
     
-    function updateBodyVisibility() {
-        const visiblePlanets = [];
-        const visibleMoons = {};
+   function updateBodyVisibility() {
+    const visiblePlanets = [];
+    const visibleMoons = {};
+    
+    document.querySelectorAll('.celestial-body').forEach(body => {
+        const bodyType = body.getAttribute('data-body-type');
+        const bodyName = body.getAttribute('data-name');
         
-        document.querySelectorAll('.celestial-body').forEach(body => {
-            const bodyType = body.getAttribute('data-body-type');
-            const bodyName = body.getAttribute('data-name');
-            
-            if (bodyType === 'planet' || bodyType === 'star') {
-                visiblePlanets.push(bodyName);
-            } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
-                const parentBody = body.dataset.parentBody;
-                if (!visibleMoons[parentBody]) {
-                    visibleMoons[parentBody] = [];
-                }
-                visibleMoons[parentBody].push(bodyName);
+        if (bodyType === 'planet' || bodyType === 'star') {
+            visiblePlanets.push(bodyName);
+        } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
+            const parentBody = body.dataset.parentBody;
+            if (!visibleMoons[parentBody]) {
+                visibleMoons[parentBody] = [];
             }
-        });
+            visibleMoons[parentBody].push(bodyName);
+        }
+    });
+    
+    document.querySelectorAll('.celestial-body').forEach(body => {
+        const bodyType = body.getAttribute('data-body-type');
+        const bodyName = body.getAttribute('data-name');
+        const tooltip = body.querySelector('.tooltip');
         
-        document.querySelectorAll('.celestial-body').forEach(body => {
-            const bodyType = body.getAttribute('data-body-type');
-            const bodyName = body.getAttribute('data-name');
-            const tooltip = body.querySelector('.tooltip');
-            
-            // Calculate appropriate scale factor based on zoom level
-            let scaleFactor = 1;
-            if (bodyType === 'planet' || bodyType === 'star') {
-                // Improved scaling formula to prevent ballooning
-                scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.5)));
-            } else if (bodyType === 'moon') {
-                scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.3)));
-            }
-            
-            const bodyContent = body.querySelector('.body-content');
-            if (bodyContent) {
-                bodyContent.style.transform = `scale(${scaleFactor})`;
-            }
-            
-            if (tooltip) {
-                tooltip.style.transform = `scale(${1/currentZoom})`;
-                tooltip.style.display = 'none';
-            }
-            
-            if (bodyType === 'planet' || bodyType === 'star') {
-                body.style.display = 'block';
-            } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
-                body.style.display = 'block';
-            } else {
-                body.style.display = 'none';
-            }
-        });
-            
-        document.querySelectorAll('.asteroid').forEach(asteroid => {
-            if (currentZoom >= bodyVisibilityThresholds.asteroid) {
-                asteroid.style.display = 'block';
-            } else {
-                asteroid.style.display = 'none';
-            }
-        });
+        // Calculate appropriate scale factor based on zoom level
+        let scaleFactor = 1;
+        if (bodyType === 'planet' || bodyType === 'star') {
+            // Improved scaling formula to prevent ballooning
+            scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.5)));
+        } else if (bodyType === 'moon') {
+            scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.3)));
+        }
         
-        document.querySelectorAll('.orbit').forEach(orbit => {
-            orbit.style.opacity = Math.min(1, currentZoom * 2);
-        });
+        const bodyContent = body.querySelector('.body-content');
+        if (bodyContent) {
+            bodyContent.style.transform = `scale(${scaleFactor})`;
+        }
         
-        document.querySelectorAll('.moon-orbit').forEach(orbit => {
-            if (currentZoom >= bodyVisibilityThresholds.moon) {
-                orbit.style.display = 'block';
-                orbit.style.opacity = Math.min(1, currentZoom * 1.5);
-            } else {
-                orbit.style.display = 'none';
-            }
-        });
+        if (tooltip) {
+            tooltip.style.transform = `scale(${1/currentZoom})`;
+            tooltip.style.display = 'none';
+        }
+        
+        // Always make the Sun visible, regardless of zoom level
+        if (bodyName === "Sol") {
+            body.style.display = 'block';
+        }
+        // For other bodies, use normal visibility rules
+        else if (bodyType === 'planet') {
+            body.style.display = 'block';
+        } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
+            body.style.display = 'block';
+        } else {
+            body.style.display = 'none';
+        }
+    });
+    
+    // Rest of the function remains the same
+    document.querySelectorAll('.asteroid').forEach(asteroid => {
+        if (currentZoom >= bodyVisibilityThresholds.asteroid) {
+            asteroid.style.display = 'block';
+        } else {
+            asteroid.style.display = 'none';
+        }
+    });
+    
+    document.querySelectorAll('.orbit').forEach(orbit => {
+        orbit.style.opacity = Math.min(1, currentZoom * 2);
+    });
+    
+    document.querySelectorAll('.moon-orbit').forEach(orbit => {
+        if (currentZoom >= bodyVisibilityThresholds.moon) {
+            orbit.style.display = 'block';
+            orbit.style.opacity = Math.min(1, currentZoom * 1.5);
+        } else {
+            orbit.style.display = 'none';
+        }
+    });
         
         updateMoonOrbits();
     }
