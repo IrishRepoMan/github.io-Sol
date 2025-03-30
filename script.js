@@ -456,8 +456,7 @@ function updateTransform() {
             description: "Pluto's largest moon, functioning as an extension of the scientific outpost.",
             type: "moon",
             inclination: 0.05
-        }
-       }, 
+        }, 
 {
     name: "Amalthea",
     diameter: 5,
