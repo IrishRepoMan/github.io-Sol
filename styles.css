@@ -354,3 +354,43 @@ body, html {
     font-style: italic;
     color: #aaddff;
 }
+
+/* Add these to your styles.css file */
+.celestial-body {
+    position: absolute;
+    border-radius: 50%;
+    overflow: visible;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease-out;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+}
+
+.celestial-body:hover {
+    z-index: 1000 !important;
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.6));
+}
+
+.tooltip {
+    position: absolute;
+    width: 250px;
+    background-color: rgba(0, 0, 0, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    padding: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1100;
+    top: 0;
+    left: 100%;
+    margin-left: 20px;
+    transform-origin: left center;
+    font-size: 14px;
+    display: none;
+}
+
+.celestial-body:hover .tooltip {
+    opacity: 1;
+    display: block;
+}
