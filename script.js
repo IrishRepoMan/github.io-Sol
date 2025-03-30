@@ -15,11 +15,24 @@ let currentZoom = 0.2; // This is now the minimum zoom (fully zoomed out)
         moon: 0.3,
         asteroid: 0.4,
         installation: 0.6
-        let animationFrameId = null;
+};
+
+let animationFrameId = null;
 let lastFrameTime = 0;
 const TARGET_FPS = 60;
 const FRAME_INTERVAL = 1000 / TARGET_FPS;
-};
+
+    function hexToRgb(hex) {
+    // Remove the # if present
+    hex = hex.replace('#', '');
+    
+    // Parse the hex values to get r, g, b components
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    return `${r}, ${g}, ${b}`;
+}
     
 function updateTransform() {
     // Only allow panning when zoomed in beyond minimum level
@@ -743,32 +756,6 @@ function updateTransform() {
         celestialBodies.forEach(body => {
             if (body.parentBody) return;
 
-            // Add this to the createCelestialBodies function, inside the planet creation loop
-if (body.type === 'planet') {
-    // Add texture gradient based on planet type
-    if (body.name === "Mercury") {
-        bodyContent.style.background = "linear-gradient(30deg, #6e6e6e, #a6a6a6, #d4d4d4)";
-    } else if (body.name === "Venus") {
-        bodyContent.style.background = "linear-gradient(30deg, #a57c1b, #e6e600, #ffffcc)";
-    } else if (body.name === "Earth") {
-        bodyContent.style.background = "linear-gradient(30deg, #1a5599, #3399ff, #66ccff)";
-    } else if (body.name === "Mars") {
-        bodyContent.style.background = "linear-gradient(30deg, #992900, #ff6600, #ff9966)";
-    } else if (body.name === "Jupiter") {
-        bodyContent.style.background = "linear-gradient(30deg, #a67c52, #d4a876, #e6c699)";
-    } else if (body.name === "Saturn") {
-        bodyContent.style.background = "linear-gradient(30deg, #b39766, #d4c099, #e6d4b3)";
-    } else if (body.name === "Uranus") {
-        bodyContent.style.background = "linear-gradient(30deg, #5dacee, #77ccff, #aaddff)";
-    } else if (body.name === "Neptune") {
-        bodyContent.style.background = "linear-gradient(30deg, #3355bb, #5577dd, #7799ff)";
-    } else if (body.name === "Pluto") {
-        bodyContent.style.background = "linear-gradient(30deg, #9a7c5c, #b39980, #ccb399)";
-    }
-    
-    // Add a subtle shadow glow
-    element.style.boxShadow = `0 0 15px rgba(${hexToRgb(body.color)}, 0.7)`;
-}
             // Improve ring appearance
 if (body.hasRings) {
     const rings = document.createElement('div');
@@ -812,8 +799,12 @@ if (body.hasRings) {
             bodyContent.className = 'body-content';
             
             const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip';
-            tooltip.innerHTML = `<h3>${body.name}</h3><p>${body.description}</p>`;
+tooltip.className = 'tooltip';
+tooltip.innerHTML = `
+    <h3>${body.name}</h3>
+    <p>${body.description}</p>
+    ${body.type === 'planet' ? `<div class="tooltip-data">Diameter: ${body.diameter} km</div>` : ''}
+`;
             
             const orbit = document.createElement('div');
             orbit.className = 'orbit';
@@ -825,7 +816,30 @@ if (body.hasRings) {
             
             if (body.inclination) {
                 orbit.style.transform = `rotateX(${body.inclination * 180}deg)`;
-            }
+            }if (body.type === 'planet') {
+    if (body.name === "Mercury") {
+        bodyContent.style.background = "linear-gradient(30deg, #6e6e6e, #a6a6a6, #d4d4d4)";
+    } else if (body.name === "Venus") {
+        bodyContent.style.background = "linear-gradient(30deg, #a57c1b, #e6e600, #ffffcc)";
+    } else if (body.name === "Earth") {
+        bodyContent.style.background = "linear-gradient(30deg, #1a5599, #3399ff, #66ccff)";
+    } else if (body.name === "Mars") {
+        bodyContent.style.background = "linear-gradient(30deg, #992900, #ff6600, #ff9966)";
+    } else if (body.name === "Jupiter") {
+        bodyContent.style.background = "linear-gradient(30deg, #a67c52, #d4a876, #e6c699)";
+    } else if (body.name === "Saturn") {
+        bodyContent.style.background = "linear-gradient(30deg, #b39766, #d4c099, #e6d4b3)";
+    } else if (body.name === "Uranus") {
+        bodyContent.style.background = "linear-gradient(30deg, #5dacee, #77ccff, #aaddff)";
+    } else if (body.name === "Neptune") {
+        bodyContent.style.background = "linear-gradient(30deg, #3355bb, #5577dd, #7799ff)";
+    } else if (body.name === "Pluto") {
+        bodyContent.style.background = "linear-gradient(30deg, #9a7c5c, #b39980, #ccb399)";
+    }
+    
+    // Add a subtle shadow glow - use hexToRgb helper function
+    element.style.boxShadow = `0 0 15px rgba(${hexToRgb(body.color)}, 0.7)`;
+}
             
             element.appendChild(bodyContent);
             element.appendChild(tooltip);
@@ -917,8 +931,12 @@ if (body.hasRings) {
             bodyContent.className = 'body-content';
             
             const tooltip = document.createElement('div');
-            tooltip.className = 'tooltip';
-            tooltip.innerHTML = `<h3>${body.name}</h3><p>${body.description}</p>`;
+tooltip.className = 'tooltip';
+tooltip.innerHTML = `
+    <h3>${body.name}</h3>
+    <p>${body.description}</p>
+    ${body.type === 'planet' ? `<div class="tooltip-data">Diameter: ${body.diameter} km</div>` : ''}
+`;
             
             const orbit = document.createElement('div');
             orbit.className = 'moon-orbit';
@@ -1036,7 +1054,10 @@ if (body.hasRings) {
             const speed = parseFloat(element.dataset.orbitSpeed || 0);
             const radius = parseFloat(element.dataset.orbitRadius || 0);
             
-            angle += (0.0002 * speed * deltaTime);
+            const deltaTime = (timestamp - lastTime) / 16.67; // Calculate deltaTime here
+lastTime = timestamp;
+
+angle += (0.0002 * speed * deltaTime);
             if (angle > Math.PI * 2) angle -= Math.PI * 2;
             element.dataset.angle = angle;
             
@@ -1249,4 +1270,23 @@ window.addEventListener('load', function() {
             loadingScreen.style.display = 'none';
         }
     }, 3000); // Force removal after 3 seconds
+
+    function cleanup() {
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+    }
+    
+    // Remove event listeners
+    document.querySelectorAll('.celestial-body').forEach(body => {
+        body.removeEventListener('mouseenter');
+        body.removeEventListener('mouseleave');
+        body.removeEventListener('click');
+    });
+    
+    document.removeEventListener('mousemove');
+    document.removeEventListener('mouseup');
+    document.removeEventListener('wheel');
+    document.removeEventListener('touchmove');
+    document.removeEventListener('touchend');
+}
 });
