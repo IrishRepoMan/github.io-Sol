@@ -2,9 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("Script loading...");
     
     const solarSystem = document.getElementById('solar-system');
-    const minZoom = 0.1;
-    const maxZoom = 1.5;
-    let currentZoom = 0.2; 
+    const minZoom = 0.2; // Increase this from 0.1 to 0.2 to prevent zooming out too far
+const maxZoom = 1.5;
+let currentZoom = 0.2; // This is now the minimum zoom (fully zoomed out)
     let isDragging = false;
     let startDragX, startDragY;
     let currentX = 0, currentY = 0;
@@ -17,21 +17,28 @@ document.addEventListener('DOMContentLoaded', function() {
         installation: 0.6
     };
     
-    function updateTransform() {
-        // Apply boundaries to prevent moving off-screen
-        const maxPan = 2500 * (1 - currentZoom);
+function updateTransform() {
+    // Only allow panning when zoomed in beyond minimum level
+    if (currentZoom <= minZoom) {
+        // Reset position when at minimum zoom
+        currentX = 0;
+        currentY = 0;
+    } else {
+        // Calculate max pan based on zoom level - tighter restrictions than before
+        const maxPan = 1500 * (currentZoom - minZoom) / (maxZoom - minZoom);
         currentX = Math.max(Math.min(currentX, maxPan), -maxPan);
         currentY = Math.max(Math.min(currentY, maxPan), -maxPan);
-        
-        solarSystem.style.transform = `translate(calc(${currentX}px - 50%), calc(${currentY}px - 50%)) scale(${currentZoom})`;
-        
-        document.getElementById('solar-system').style.visibility = 'visible';
-        document.getElementById('solar-system').style.opacity = '1';
-        document.getElementById('universe').style.backgroundColor = '#000';
-
-        updateZoomDisplay();
-        updateBodyVisibility();
     }
+    
+    solarSystem.style.transform = `translate(calc(${currentX}px - 50%), calc(${currentY}px - 50%)) scale(${currentZoom})`;
+    
+    document.getElementById('solar-system').style.visibility = 'visible';
+    document.getElementById('solar-system').style.opacity = '1';
+    document.getElementById('universe').style.backgroundColor = '#000';
+
+    updateZoomDisplay();
+    updateBodyVisibility();
+}
     
     function updateMoonOrbits() {
         document.querySelectorAll('.celestial-body.moon').forEach(moon => {
@@ -757,19 +764,23 @@ document.addEventListener('DOMContentLoaded', function() {
         updateTransform();
     });
     
-    document.getElementById('reset').addEventListener('click', function() {
-        currentZoom = 0.2;
-        currentX = 0;
-        currentY = 0;
-        updateTransform();
-    });
+document.getElementById('reset').addEventListener('click', function() {
+    currentZoom = minZoom; // Set to minimum zoom (max zoomed out)
+    currentX = 0;
+    currentY = 0;
+    updateTransform();
+});
     
-    solarSystem.addEventListener('mousedown', function(e) {
+    // Replace the mousedown event listener around line 304-309
+solarSystem.addEventListener('mousedown', function(e) {
+    // Only allow dragging when zoomed in
+    if (currentZoom > minZoom) {
         isDragging = true;
         startDragX = e.clientX - currentX;
         startDragY = e.clientY - currentY;
-        e.preventDefault();
-    });
+    }
+    e.preventDefault();
+});
     
     document.addEventListener('mousemove', function(e) {
     if (!isDragging) return;
@@ -784,30 +795,39 @@ document.addEventListener('mouseup', function() {
     isDragging = false;
 });
 
+// Replace the wheel event listener around line 323-352
 document.addEventListener('wheel', function(e) {
     e.preventDefault();
+    
+    const oldZoom = currentZoom;
     
     // Get mouse position relative to the universe element
     const rect = document.getElementById('universe').getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     
-    // Calculate point to zoom towards (relative to center)
-    const oldZoom = currentZoom;
-    
     if (e.deltaY < 0) {
+        // Zooming in
         currentZoom = Math.min(currentZoom * 1.1, maxZoom);
     } else {
+        // Zooming out
         currentZoom = Math.max(currentZoom * 0.9, minZoom);
     }
     
-    // Adjust position to zoom toward cursor
-    const zoomRatio = currentZoom / oldZoom;
-    const targetX = (mouseX - rect.width/2);
-    const targetY = (mouseY - rect.height/2);
-    
-    currentX = currentX - (targetX * (zoomRatio - 1));
-    currentY = currentY - (targetY * (zoomRatio - 1));
+    // Only calculate zoom target if we're zoomed in
+    if (currentZoom > minZoom) {
+        // Adjust position to zoom toward cursor
+        const zoomRatio = currentZoom / oldZoom;
+        const targetX = (mouseX - rect.width/2);
+        const targetY = (mouseY - rect.height/2);
+        
+        currentX = currentX - (targetX * (zoomRatio - 1));
+        currentY = currentY - (targetY * (zoomRatio - 1));
+    } else {
+        // Reset position when at minimum zoom
+        currentX = 0;
+        currentY = 0;
+    }
     
     updateTransform();
 }, { passive: false });
