@@ -31,81 +31,89 @@ document.addEventListener('DOMContentLoaded', function() {
         updateBodyVisibility();
     }
     
-    function updateMoonOrbits() {
-       document.querySelectorAll('.celestial-body.moon').forEach(moon => {
-    let angle = parseFloat(moon.dataset.angle || 0);
-    const speed = parseFloat(moon.dataset.orbitSpeed || 0);
-    const radius = parseFloat(moon.dataset.adjustedRadius || moon.dataset.orbitRadius || 0);
-    
-    angle += (0.0005 * speed * deltaTime);
-    if (angle > Math.PI * 2) angle -= Math.PI * 2;
-    moon.dataset.angle = angle;
-    
-    const parentElement = moon.parentElement;
-    if (!parentElement) return;
-    
-    const diameter = parseFloat(moon.style.width);
-    const parentDiameter = parseFloat(parentElement.style.width);
-    
-    // Calculate position based on orbit radius and angle
-    const moonX = radius * Math.cos(angle);
-    const moonY = radius * Math.sin(angle);
-    
-    // Position centered on parent and offset by orbit
-    moon.style.left = `${(parentDiameter - diameter) / 2 + moonX}px`;
-    moon.style.top = `${(parentDiameter - diameter) / 2 + moonY}px`;
-});
-    }
+   function updateMoonOrbits() {
+    document.querySelectorAll('.celestial-body.moon').forEach(moon => {
+        const parentBody = moon.dataset.parentBody;
+        if (!parentBody) return;
+        
+        const parentElement = document.querySelector(`.${parentBody.toLowerCase()}`);
+        if (!parentElement) return;
+        
+        const parentDiameter = parseFloat(parentElement.style.width);
+        const moonDiameter = parseFloat(moon.style.width);
+        
+        // Calculate minimum orbit distance (outside the parent planet)
+        let minOrbitRadius = parentDiameter / 2 + moonDiameter / 2 + 5; // Adding 5px padding
+        
+        // Get the base orbit radius
+        let orbitRadius = parseFloat(moon.dataset.orbitRadius || 0);
+        
+        // Ensure orbit is outside the parent planet
+        orbitRadius = Math.max(orbitRadius, minOrbitRadius);
+        moon.dataset.adjustedRadius = orbitRadius;
+        
+        // Update moon orbit display
+        const orbit = parentElement.querySelector(`.moon-orbit[data-moon="${moon.getAttribute('data-name')}"]`);
+        if (orbit) {
+            orbit.style.width = `${orbitRadius * 2}px`;
+            orbit.style.height = `${orbitRadius * 2}px`;
+            orbit.style.left = `${(parentDiameter - orbitRadius * 2) / 2}px`;
+            orbit.style.top = `${(parentDiameter - orbitRadius * 2) / 2}px`;
+        }
+    });
+}
     
     function updateBodyVisibility() {
-        const visiblePlanets = [];
-        const visibleMoons = {};
+    const visiblePlanets = [];
+    const visibleMoons = {};
+    
+    document.querySelectorAll('.celestial-body').forEach(body => {
+        const bodyType = body.getAttribute('data-body-type');
+        const bodyName = body.getAttribute('data-name');
         
-        document.querySelectorAll('.celestial-body').forEach(body => {
-            const bodyType = body.getAttribute('data-body-type');
-            const bodyName = body.getAttribute('data-name');
-            
-            if (bodyType === 'planet' || bodyType === 'star') {
-                visiblePlanets.push(bodyName);
-            } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
-                const parentBody = body.dataset.parentBody;
-                if (!visibleMoons[parentBody]) {
-                    visibleMoons[parentBody] = [];
-                }
-                visibleMoons[parentBody].push(bodyName);
+        if (bodyType === 'planet' || bodyType === 'star') {
+            visiblePlanets.push(bodyName);
+        } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
+            const parentBody = body.dataset.parentBody;
+            if (!visibleMoons[parentBody]) {
+                visibleMoons[parentBody] = [];
             }
-        });
+            visibleMoons[parentBody].push(bodyName);
+        }
+    });
+    
+    document.querySelectorAll('.celestial-body').forEach(body => {
+        const bodyType = body.getAttribute('data-body-type');
+        const bodyName = body.getAttribute('data-name');
+        const tooltip = body.querySelector('.tooltip');
         
-        document.querySelectorAll('.celestial-body').forEach(body => {
-            const bodyType = body.getAttribute('data-body-type');
-            const bodyName = body.getAttribute('data-name');
-            const tooltip = body.querySelector('.tooltip');
-            
-            let scaleFactor = 1;
-            if (bodyType === 'planet') {
-                scaleFactor = Math.max(0.7, 1 / (currentZoom * 0.8));
-            } else if (bodyType === 'moon') {
-                scaleFactor = Math.max(0.5, 1 / (currentZoom * 0.7));
-            }
-            
-            const bodyContent = body.querySelector('.body-content');
-            if (bodyContent) {
-                bodyContent.style.transform = `scale(${scaleFactor})`;
-            }
-            
-            if (tooltip) {
-                tooltip.style.transform = `scale(${1/currentZoom})`;
-                tooltip.style.display = 'none';
-            }
-            
-            if (bodyType === 'planet' || bodyType === 'star') {
-                body.style.display = 'block';
-            } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
-                body.style.display = 'block';
-            } else {
-                body.style.display = 'none';
-            }
-        });
+        // Calculate appropriate scale factor based on zoom level
+        let scaleFactor = 1;
+        if (bodyType === 'planet' || bodyType === 'star') {
+            // Improved scaling formula to prevent ballooning
+            scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.5)));
+        } else if (bodyType === 'moon') {
+            scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.3)));
+        }
+        
+        const bodyContent = body.querySelector('.body-content');
+        if (bodyContent) {
+            bodyContent.style.transform = `scale(${scaleFactor})`;
+        }
+        
+        if (tooltip) {
+            tooltip.style.transform = `scale(${1/currentZoom})`;
+            tooltip.style.display = 'none';
+        }
+        
+        if (bodyType === 'planet' || bodyType === 'star') {
+            body.style.display = 'block';
+        } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
+            body.style.display = 'block';
+        } else {
+            body.style.display = 'none';
+        }
+    });
         
         document.querySelectorAll('.asteroid').forEach(asteroid => {
             if (currentZoom >= bodyVisibilityThresholds.asteroid) {
@@ -477,10 +485,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 orbit.style.transform = `rotateX(${body.inclination * 180}deg)`;
             }
             
-            element.appendChild(bodyContent);
-            element.appendChild(tooltip);
-            solarSystem.appendChild(element);
-            solarSystem.appendChild(orbit);
+           element.appendChild(bodyContent);
+element.appendChild(tooltip);
+parentElement.appendChild(element);
+parentElement.appendChild(orbit);
+
+element.addEventListener('click', function(e) {
+    e.stopPropagation();
+    window.location.href = `detail.html?body=${body.name.toLowerCase()}`;
+});
+
+// Add hover events for tooltips
+element.addEventListener('mouseenter', function(e) {
+    // Hide all other tooltips first
+    document.querySelectorAll('.tooltip').forEach(t => {
+        t.style.display = 'none';
+    });
+    
+    // Show only this tooltip
+    const tooltip = this.querySelector('.tooltip');
+    if (tooltip) {
+        tooltip.style.display = 'block';
+        tooltip.style.transform = `scale(${1/currentZoom})`;
+    }
+    e.stopPropagation();
+});
+
+element.addEventListener('mouseleave', function() {
+    const tooltip = this.querySelector('.tooltip');
+    if (tooltip) {
+        tooltip.style.display = 'none';
+    }
+});
             
             if (body.hasRings) {
                 const rings = document.createElement('div');
@@ -667,27 +703,29 @@ document.addEventListener('DOMContentLoaded', function() {
             element.style.top = `${y - diameter/2}px`;
         });
         
-        document.querySelectorAll('.celestial-body.moon').forEach(moon => {
-            let angle = parseFloat(moon.dataset.angle || 0);
-            const speed = parseFloat(moon.dataset.orbitSpeed || 0);
-            const radius = parseFloat(moon.dataset.adjustedRadius || moon.dataset.orbitRadius || 0);
-            
-            angle += (0.0005 * speed * deltaTime);
-            if (angle > Math.PI * 2) angle -= Math.PI * 2;
-            moon.dataset.angle = angle;
-            
-            const parentElement = moon.parentElement;
-            if (!parentElement) return;
-            
-            const diameter = parseFloat(moon.style.width);
-            const parentDiameter = parseFloat(parentElement.style.width);
-            
-            const moonX = radius * Math.cos(angle);
-            const moonY = radius * Math.sin(angle);
-            
-            moon.style.left = `${(parentDiameter - diameter) / 2 + moonX}px`;
-            moon.style.top = `${(parentDiameter - diameter) / 2 + moonY}px`;
-        });
+       document.querySelectorAll('.celestial-body.moon').forEach(moon => {
+    let angle = parseFloat(moon.dataset.angle || 0);
+    const speed = parseFloat(moon.dataset.orbitSpeed || 0);
+    const radius = parseFloat(moon.dataset.adjustedRadius || moon.dataset.orbitRadius || 0);
+    
+    angle += (0.0005 * speed * deltaTime);
+    if (angle > Math.PI * 2) angle -= Math.PI * 2;
+    moon.dataset.angle = angle;
+    
+    const parentElement = moon.parentElement;
+    if (!parentElement) return;
+    
+    const diameter = parseFloat(moon.style.width);
+    const parentDiameter = parseFloat(parentElement.style.width);
+    
+    // Calculate position based on orbit radius and angle
+    const moonX = radius * Math.cos(angle);
+    const moonY = radius * Math.sin(angle);
+    
+    // Position centered on parent and offset by orbit
+    moon.style.left = `${(parentDiameter - diameter) / 2 + moonX}px`;
+    moon.style.top = `${(parentDiameter - diameter) / 2 + moonY}px`;
+});
         
         document.querySelectorAll('.asteroid').forEach(asteroid => {
             let angle = parseFloat(asteroid.dataset.angle || 0);
@@ -757,9 +795,18 @@ document.addEventListener('DOMContentLoaded', function() {
    document.addEventListener('wheel', function(e) {
     e.preventDefault();
     
+    // Get mouse position relative to the universe element
     const rect = document.getElementById('universe').getBoundingClientRect();
-    const mouseX = e.clientX - rect.left - (rect.width / 2);
-    const mouseY = e.clientY - rect.top - (rect.height / 2);
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // Convert to solar system coordinates
+    const containerCenterX = rect.width / 2;
+    const containerCenterY = rect.height / 2;
+    
+    // Calculate point to zoom towards (relative to center)
+    const targetX = (mouseX - containerCenterX) / currentZoom;
+    const targetY = (mouseY - containerCenterY) / currentZoom;
     
     const oldZoom = currentZoom;
     
@@ -769,10 +816,10 @@ document.addEventListener('DOMContentLoaded', function() {
         currentZoom = Math.max(currentZoom * 0.9, minZoom);
     }
     
-    const zoomChange = currentZoom / oldZoom;
-    
-    currentX = mouseX + (currentX - mouseX) * zoomChange;
-    currentY = mouseY + (currentY - mouseY) * zoomChange;
+    // Adjust position to zoom toward cursor
+    const scaleFactor = currentZoom / oldZoom - 1;
+    currentX -= targetX * scaleFactor;
+    currentY -= targetY * scaleFactor;
     
     updateTransform();
 }, { passive: false });
