@@ -2,20 +2,24 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("Script loading...");
     
     const solarSystem = document.getElementById('solar-system');
-    const minZoom = 0.2; // Increase this from 0.1 to 0.2 to prevent zooming out too far
+    const minZoom = 0.2;
     const maxZoom = 1.5;
-    let currentZoom = 0.2; // This is now the minimum zoom (fully zoomed out)
+    let currentZoom = 0.2;
     let isDragging = false;
     let startDragX, startDragY;
     let currentX = 0, currentY = 0;
     let lastTime = 0;
-    let zoomTarget = { x: 0, y: 0 };
     let bodyVisibilityThresholds = {
         planet: 0.1,
         moon: 0.3,
-        asteroid: 0.4,
-        installation: 0.6
+        asteroid: 0.5 // Increased threshold to show fewer asteroids for better performance
     };
+    
+    // Animation optimization - use requestAnimationFrame ID to cancel when needed
+    let animationFrameId = null;
+    
+    // Reduced number of asteroids for better performance
+    const asteroidCount = 100; // Reduced from 300
     
     function updateTransform() {
         // Only allow panning when zoomed in beyond minimum level
@@ -24,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
             currentX = 0;
             currentY = 0;
         } else {
-            // Calculate max pan based on zoom level - tighter restrictions than before
+            // Calculate max pan based on zoom level
             const maxPan = 1500 * (currentZoom - minZoom) / (maxZoom - minZoom);
             currentX = Math.max(Math.min(currentX, maxPan), -maxPan);
             currentY = Math.max(Math.min(currentY, maxPan), -maxPan);
@@ -58,7 +62,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return true; // This prevents the browser's default error handling
     };
     
+    // Performance optimization: Only update moon orbits when necessary
+    let moonOrbitsNeedUpdate = true;
+    
     function updateMoonOrbits() {
+        if (!moonOrbitsNeedUpdate) return;
+        
         document.querySelectorAll('.celestial-body.moon').forEach(moon => {
             const parentBody = moon.dataset.parentBody;
             if (!parentBody) return;
@@ -69,8 +78,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const parentDiameter = parseFloat(parentElement.style.width);
             const moonDiameter = parseFloat(moon.style.width);
             
-            // Calculate minimum orbit distance (outside the parent planet)
-            let minOrbitRadius = parentDiameter / 2 + moonDiameter / 2 + 5; // Adding 5px padding
+            // Calculate minimum orbit distance
+            let minOrbitRadius = parentDiameter / 2 + moonDiameter / 2 + 5;
             
             // Get the base orbit radius
             let orbitRadius = parseFloat(moon.dataset.orbitRadius || 0);
@@ -88,42 +97,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 orbit.style.top = `${(parentDiameter - orbitRadius * 2) / 2}px`;
             }
         });
+        
+        moonOrbitsNeedUpdate = false;
     }
     
     function updateBodyVisibility() {
-        const visiblePlanets = [];
-        const visibleMoons = {};
+        const planetItems = document.querySelectorAll('.celestial-body[data-body-type="planet"], .celestial-body[data-body-type="star"]');
+        const moonItems = document.querySelectorAll('.celestial-body[data-body-type="moon"]');
+        const asteroidItems = document.querySelectorAll('.asteroid');
+        const orbitItems = document.querySelectorAll('.orbit');
+        const moonOrbitItems = document.querySelectorAll('.moon-orbit');
         
-        document.querySelectorAll('.celestial-body').forEach(body => {
-            const bodyType = body.getAttribute('data-body-type');
-            const bodyName = body.getAttribute('data-name');
-            
-            if (bodyType === 'planet' || bodyType === 'star') {
-                visiblePlanets.push(bodyName);
-            } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
-                const parentBody = body.dataset.parentBody;
-                if (!visibleMoons[parentBody]) {
-                    visibleMoons[parentBody] = [];
-                }
-                visibleMoons[parentBody].push(bodyName);
-            }
-        });
-        
-        document.querySelectorAll('.celestial-body').forEach(body => {
-            const bodyType = body.getAttribute('data-body-type');
+        // Handle planets and the sun
+        planetItems.forEach(body => {
             const bodyName = body.getAttribute('data-name');
             const tooltip = body.querySelector('.tooltip');
+            const bodyContent = body.querySelector('.body-content');
             
-            // Calculate appropriate scale factor based on zoom level
-            let scaleFactor = 1;
-            if (bodyType === 'planet' || bodyType === 'star') {
-                // Improved scaling formula to prevent ballooning
-                scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.5)));
-            } else if (bodyType === 'moon') {
-                scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.3)));
+            // Always make the Sun visible, regardless of zoom level
+            if (bodyName === "Sol") {
+                body.style.display = 'block';
+            } else {
+                body.style.display = 'block';
             }
             
-            const bodyContent = body.querySelector('.body-content');
+            // Scale factor based on zoom level
+            let scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.5)));
+            
             if (bodyContent) {
                 bodyContent.style.transform = `scale(${scaleFactor})`;
             }
@@ -132,23 +132,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 tooltip.style.transform = `scale(${1/currentZoom})`;
                 tooltip.style.display = 'none';
             }
+        });
+        
+        // Handle moons
+        moonItems.forEach(moon => {
+            const tooltip = moon.querySelector('.tooltip');
+            const bodyContent = moon.querySelector('.body-content');
             
-            // Always make the Sun visible, regardless of zoom level
-            if (bodyName === "Sol") {
-                body.style.display = 'block';
-            }
-            // For other bodies, use normal visibility rules
-            else if (bodyType === 'planet') {
-                body.style.display = 'block';
-            } else if (bodyType === 'moon' && currentZoom >= bodyVisibilityThresholds.moon) {
-                body.style.display = 'block';
+            // Visibility based on zoom threshold
+            if (currentZoom >= bodyVisibilityThresholds.moon) {
+                moon.style.display = 'block';
             } else {
-                body.style.display = 'none';
+                moon.style.display = 'none';
+            }
+            
+            // Scale factor for moons
+            let scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.3)));
+            
+            if (bodyContent) {
+                bodyContent.style.transform = `scale(${scaleFactor})`;
+            }
+            
+            if (tooltip) {
+                tooltip.style.transform = `scale(${1/currentZoom})`;
+                tooltip.style.display = 'none';
             }
         });
         
-        // Rest of the function remains the same
-        document.querySelectorAll('.asteroid').forEach(asteroid => {
+        // Handle asteroids - performance critical
+        asteroidItems.forEach(asteroid => {
             if (currentZoom >= bodyVisibilityThresholds.asteroid) {
                 asteroid.style.display = 'block';
             } else {
@@ -156,11 +168,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        document.querySelectorAll('.orbit').forEach(orbit => {
+        // Handle orbits
+        orbitItems.forEach(orbit => {
             orbit.style.opacity = Math.min(1, currentZoom * 2);
         });
         
-        document.querySelectorAll('.moon-orbit').forEach(orbit => {
+        // Handle moon orbits
+        moonOrbitItems.forEach(orbit => {
             if (currentZoom >= bodyVisibilityThresholds.moon) {
                 orbit.style.display = 'block';
                 orbit.style.opacity = Math.min(1, currentZoom * 1.5);
@@ -169,7 +183,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
             
-        updateMoonOrbits();
+        if (currentZoom >= bodyVisibilityThresholds.moon) {
+            moonOrbitsNeedUpdate = true;
+            updateMoonOrbits();
+        }
     }
     
     function updateZoomDisplay() {
@@ -381,28 +398,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ringColor: "rgba(150, 200, 255, 0.3)"
         },
         {
-            name: "Miranda",
-            diameter: 8,
-            orbitRadius: 30,
-            orbitSpeed: 1.2,
-            parentBody: "Uranus",
-            color: "#aabbcc",
-            description: "Uranus' moon with unusual surface features, now hosting gas processing facilities.",
-            type: "moon",
-            inclination: 0.04
-        },
-        {
-            name: "Titania",
-            diameter: 10,
-            orbitRadius: 40,
-            orbitSpeed: 0.9,
-            parentBody: "Uranus",
-            color: "#bbccdd",
-            description: "Largest moon of Uranus with significant imperial presence.",
-            type: "moon",
-            inclination: 0.05
-        },
-        {
             name: "Neptune",
             diameter: 68,
             orbitRadius: 2100,
@@ -416,6 +411,108 @@ document.addEventListener('DOMContentLoaded', function() {
             ringColor: "rgba(100, 150, 255, 0.3)"
         },
         {
+            name: "Pluto",
+            diameter: 16,
+            orbitRadius: 2400,
+            orbitSpeed: 0.004,
+            color: "#ccb399",
+            description: "Dwarf planet serving as humanity's forward scientific observatory, accessible to all factions for research.",
+            type: "planet",
+            inclination: 0.14
+        }
+    ];
+    
+    // Major moons array - for better performance, we'll only include important moons
+    const majorMoons = [
+        {
+            name: "Luna",
+            diameter: 12,
+            orbitRadius: 25,
+            orbitSpeed: 1.5,
+            parentBody: "Earth",
+            color: "#cccccc",
+            description: "Earth's moon, home to early human colonization efforts and historical sites of significance.",
+            type: "moon",
+            inclination: 0.08
+        },
+        {
+            name: "Phobos",
+            diameter: 6,
+            orbitRadius: 18,
+            orbitSpeed: 3,
+            parentBody: "Mars",
+            color: "#aaaaaa",
+            description: "Mars' larger moon, now home to orbital transfer stations and habitat construction facilities.",
+            type: "moon",
+            inclination: 0.04
+        },
+        {
+            name: "Deimos",
+            diameter: 4,
+            orbitRadius: 26,
+            orbitSpeed: 2,
+            parentBody: "Mars",
+            color: "#999999",
+            description: "Mars' smaller moon, hosting observatories and communication relay stations.",
+            type: "moon",
+            inclination: 0.07
+        },
+        {
+            name: "Io",
+            diameter: 10,
+            orbitRadius: 35,
+            orbitSpeed: 1.8,
+            parentBody: "Jupiter",
+            color: "#ffffaa",
+            description: "Jupiter's volcanically active moon with specialized mining operations.",
+            type: "moon",
+            inclination: 0.05
+        },
+        {
+            name: "Europa",
+            diameter: 10,
+            orbitRadius: 45,
+            orbitSpeed: 1.4,
+            parentBody: "Jupiter",
+            color: "#ffffee",
+            description: "Jupiter's ice-covered moon with subsurface ocean, hosting scientific outposts.",
+            type: "moon",
+            inclination: 0.02
+        },
+        {
+            name: "Ganymede",
+            diameter: 15,
+            orbitRadius: 60,
+            orbitSpeed: 1.0,
+            parentBody: "Jupiter",
+            color: "#cccccc",
+            description: "Jupiter's largest moon and an important administrative center for Jovian operations.",
+            type: "moon",
+            inclination: 0.03
+        },
+        {
+            name: "Callisto",
+            diameter: 14,
+            orbitRadius: 75,
+            orbitSpeed: 0.8,
+            parentBody: "Jupiter",
+            color: "#999999",
+            description: "Jupiter's outermost large moon with significant habitat development.",
+            type: "moon",
+            inclination: 0.04
+        },
+        {
+            name: "Titan",
+            diameter: 16,
+            orbitRadius: 60,
+            orbitSpeed: 0.9,
+            parentBody: "Saturn",
+            color: "#e6b800",
+            description: "Saturn's largest moon and the administrative center of the Outer System Empire.",
+            type: "moon",
+            inclination: 0.05
+        },
+        {
             name: "Triton",
             diameter: 12,
             orbitRadius: 40,
@@ -425,269 +522,6 @@ document.addEventListener('DOMContentLoaded', function() {
             description: "Neptune's largest moon with significant imperial presence and specialized manufacturing.",
             type: "moon",
             inclination: 0.08
-        },
-        {
-            name: "Proteus",
-            diameter: 6,
-            orbitRadius: 25,
-            orbitSpeed: 1.5,
-            parentBody: "Neptune",
-            color: "#aaaaee",
-            description: "A dark, irregularly shaped moon hosting monitoring stations.",
-            type: "moon",
-            inclination: 0.03
-        },
-        {
-            name: "Pluto",
-            diameter: 16,
-            orbitRadius: 2400,
-            orbitSpeed: 0.004,
-            color: "#ccb399",
-            description: "Dwarf planet serving as humanity's forward scientific observatory, accessible to all factions for research.",
-            type: "planet",
-            inclination: 0.14
-        },
-        {
-            name: "Charon",
-            diameter: 8,
-            orbitRadius: 12,
-            orbitSpeed: 1.2,
-            parentBody: "Pluto",
-            color: "#bbaa99",
-            description: "Pluto's largest moon, functioning as an extension of the scientific outpost.",
-            type: "moon",
-            inclination: 0.05
-        },
-        {
-            name: "Amalthea",
-            diameter: 5,
-            orbitRadius: 25,
-            orbitSpeed: 2.2,
-            parentBody: "Jupiter",
-            color: "#b35900",
-            description: "A small, irregularly shaped inner moon of Jupiter with a reddish appearance.",
-            type: "moon",
-            inclination: 0.04
-        },
-        {
-            name: "Himalia",
-            diameter: 6,
-            orbitRadius: 85,
-            orbitSpeed: 0.7,
-            parentBody: "Jupiter",
-            color: "#888888",
-            description: "The largest member of Jupiter's irregular satellite group.",
-            type: "moon",
-            inclination: 0.06
-        },
-        {
-            name: "Thebe",
-            diameter: 4,
-            orbitRadius: 28,
-            orbitSpeed: 2.0,
-            parentBody: "Jupiter",
-            color: "#a9a9a9",
-            description: "A small inner moon of Jupiter, heavily cratered from impacts.",
-            type: "moon",
-            inclination: 0.05
-        },
-        {
-            name: "Metis",
-            diameter: 3,
-            orbitRadius: 22,
-            orbitSpeed: 2.5,
-            parentBody: "Jupiter",
-            color: "#a0a0a0",
-            description: "Jupiter's innermost known moon, orbiting close to the planet's cloud tops.",
-            type: "moon",
-            inclination: 0.03
-        },
-        {
-            name: "Mimas",
-            diameter: 8,
-            orbitRadius: 30,
-            orbitSpeed: 1.5,
-            parentBody: "Saturn",
-            color: "#e6e6e6",
-            description: "Saturn's 'Death Star' moon with a distinctive large crater.",
-            type: "moon",
-            inclination: 0.04
-        },
-        {
-            name: "Tethys",
-            diameter: 9,
-            orbitRadius: 40,
-            orbitSpeed: 1.3,
-            parentBody: "Saturn",
-            color: "#f2f2f2",
-            description: "An icy moon with a large crater and a massive canyon system.",
-            type: "moon",
-            inclination: 0.05
-        },
-        {
-            name: "Dione",
-            diameter: 9,
-            orbitRadius: 50,
-            orbitSpeed: 1.0,
-            parentBody: "Saturn",
-            color: "#e6e6e6",
-            description: "An icy moon with bright cliffs and a variety of terrains.",
-            type: "moon",
-            inclination: 0.04
-        },
-        {
-            name: "Iapetus",
-            diameter: 10,
-            orbitRadius: 70,
-            orbitSpeed: 0.7,
-            parentBody: "Saturn",
-            color: "#b3b3b3",
-            description: "Saturn's two-toned moon with one dark and one light hemisphere.",
-            type: "moon",
-            inclination: 0.08
-        },
-        {
-            name: "Hyperion",
-            diameter: 6,
-            orbitRadius: 65,
-            orbitSpeed: 0.8,
-            parentBody: "Saturn",
-            color: "#c2c2c2",
-            description: "A chaotically tumbling moon with a sponge-like appearance.",
-            type: "moon",
-            inclination: 0.07
-        },
-        {
-            name: "Ariel",
-            diameter: 9,
-            orbitRadius: 50,
-            orbitSpeed: 1.0,
-            parentBody: "Uranus",
-            color: "#a3c2d5",
-            description: "One of Uranus's five major moons, with a relatively young surface.",
-            type: "moon",
-            inclination: 0.04
-        },
-        {
-            name: "Umbriel",
-            diameter: 9,
-            orbitRadius: 55,
-            orbitSpeed: 0.9,
-            parentBody: "Uranus",
-            color: "#808c99",
-            description: "One of Uranus's darkest moons with an ancient, heavily cratered surface.",
-            type: "moon",
-            inclination: 0.05
-        },
-        {
-            name: "Oberon",
-            diameter: 11,
-            orbitRadius: 60,
-            orbitSpeed: 0.8,
-            parentBody: "Uranus",
-            color: "#93a3b3",
-            description: "The outermost of Uranus's major moons, with an old, cratered surface.",
-            type: "moon",
-            inclination: 0.06
-        },
-        {
-            name: "Puck",
-            diameter: 4,
-            orbitRadius: 25,
-            orbitSpeed: 1.4,
-            parentBody: "Uranus",
-            color: "#a5b5c5",
-            description: "A small inner moon of Uranus discovered by Voyager 2.",
-            type: "moon",
-            inclination: 0.03
-        },
-        {
-            name: "Nereid",
-            diameter: 5,
-            orbitRadius: 55,
-            orbitSpeed: 0.7,
-            parentBody: "Neptune",
-            color: "#b3c6d9",
-            description: "Neptune's third-largest moon with a highly eccentric orbit.",
-            type: "moon",
-            inclination: 0.07
-        },
-        {
-            name: "Larissa",
-            diameter: 5,
-            orbitRadius: 30,
-            orbitSpeed: 1.3,
-            parentBody: "Neptune",
-            color: "#8faabf",
-            description: "An irregularly shaped inner moon of Neptune.",
-            type: "moon",
-            inclination: 0.04
-        },
-        {
-            name: "Naiad",
-            diameter: 3,
-            orbitRadius: 20,
-            orbitSpeed: 1.8,
-            parentBody: "Neptune",
-            color: "#8aa6bf",
-            description: "The innermost satellite of Neptune, orbiting within the planet's ring system.",
-            type: "moon",
-            inclination: 0.03
-        },
-        {
-            name: "Thalassa",
-            diameter: 4,
-            orbitRadius: 22,
-            orbitSpeed: 1.6,
-            parentBody: "Neptune",
-            color: "#8da9c2",
-            description: "A small inner moon of Neptune discovered by Voyager 2.",
-            type: "moon",
-            inclination: 0.03
-        },
-        {
-            name: "Nix",
-            diameter: 3,
-            orbitRadius: 18,
-            orbitSpeed: 1.0,
-            parentBody: "Pluto",
-            color: "#ccbdb3",
-            description: "A small, irregularly shaped moon of Pluto.",
-            type: "moon",
-            inclination: 0.04
-        },
-        {
-            name: "Hydra",
-            diameter: 3,
-            orbitRadius: 23,
-            orbitSpeed: 0.8,
-            parentBody: "Pluto",
-            color: "#ccc3bb",
-            description: "The outermost known moon of Pluto.",
-            type: "moon",
-            inclination: 0.03
-        },
-        {
-            name: "Kerberos",
-            diameter: 2,
-            orbitRadius: 20,
-            orbitSpeed: 0.9,
-            parentBody: "Pluto",
-            color: "#c1b6ae",
-            description: "A small moon of Pluto discovered in 2011.",
-            type: "moon",
-            inclination: 0.04
-        },
-        {
-            name: "Styx",
-            diameter: 2,
-            orbitRadius: 16,
-            orbitSpeed: 1.1,
-            parentBody: "Pluto",
-            color: "#c9bfb7",
-            description: "The innermost moon of Pluto, and the last to be discovered.",
-            type: "moon",
-            inclination: 0.03
         }
     ];
     
@@ -699,8 +533,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function createCelestialBodies() {
         console.log("Creating celestial bodies...");
         
+        // First, handle the planets and sun
         celestialBodies.forEach(body => {
-            if (body.parentBody) return;
+            if (body.parentBody) return; // Skip moons for now
             
             if (body.name === "Sol") {
                 const sunElement = document.querySelector('.sun');
@@ -796,9 +631,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Created ${body.name} at position:`, x, y);
         });
         
-        celestialBodies.forEach(body => {
-            if (!body.parentBody) return;
-            
+        // Then handle the major moons for better performance
+        majorMoons.forEach(body => {
             const parentElement = document.querySelector(`.${body.parentBody.toLowerCase()}`);
             if (!parentElement) {
                 console.error(`Parent body ${body.parentBody} not found for moon ${body.name}`);
@@ -901,7 +735,9 @@ document.addEventListener('DOMContentLoaded', function() {
        const beltContainer = document.createElement('div');
        beltContainer.className = 'asteroid-belt';
        
-       const asteroidCount = 300;
+       // Use documentFragment for better performance when adding multiple elements
+       const fragment = document.createDocumentFragment();
+       
        const minRadius = 750;
        const maxRadius = 850;
        
@@ -928,18 +764,36 @@ document.addEventListener('DOMContentLoaded', function() {
            asteroid.dataset.radius = radius;
            asteroid.dataset.orbitSpeed = 0.04 + Math.random() * 0.08;
            
-           beltContainer.appendChild(asteroid);
+           fragment.appendChild(asteroid);
        }
        
+       beltContainer.appendChild(fragment);
        solarSystem.appendChild(beltContainer);
        console.log("Asteroid belt created with", asteroidCount, "asteroids");
    }
+   
+   // Use throttling to limit animation updates
+   const throttledUpdate = (function() {
+       let lastExecution = 0;
+       
+       return function(timestamp) {
+           // Only update if delta time is significant
+           if (timestamp - lastExecution > 50) { // Limit to 20fps for non-critical animations
+               moonOrbitsNeedUpdate = true;
+               lastExecution = timestamp;
+           }
+       };
+   })();
    
    function animateCelestialBodies(timestamp) {
        if (!lastTime) lastTime = timestamp;
        const deltaTime = (timestamp - lastTime) / 16.67;
        lastTime = timestamp;
        
+       // Throttle updates for performance
+       throttledUpdate(timestamp);
+       
+       // Animate planets
        document.querySelectorAll('.celestial-body:not(.moon)').forEach(element => {
            if (element.getAttribute('data-name') === 'Sol') return;
            
@@ -951,7 +805,7 @@ document.addEventListener('DOMContentLoaded', function() {
            if (angle > Math.PI * 2) angle -= Math.PI * 2;
            element.dataset.angle = angle;
            
-           const diameter = parseFloat(element.style.width);
+          const diameter = parseFloat(element.style.width);
            const x = systemCenter.x + Math.cos(angle) * radius;
            const y = systemCenter.y + Math.sin(angle) * radius;
            
@@ -959,56 +813,77 @@ document.addEventListener('DOMContentLoaded', function() {
            element.style.top = `${y - diameter/2}px`;
        });
        
-       document.querySelectorAll('.celestial-body.moon').forEach(moon => {
-           let angle = parseFloat(moon.dataset.angle || 0);
-           const speed = parseFloat(moon.dataset.orbitSpeed || 0);
-           const radius = parseFloat(moon.dataset.adjustedRadius || moon.dataset.orbitRadius || 0);
-           
-           angle += (0.0005 * speed * deltaTime);
-           if (angle > Math.PI * 2) angle -= Math.PI * 2;
-           moon.dataset.angle = angle;
-           
-           const parentElement = moon.parentElement;
-           if (!parentElement) return;
-           
-           const diameter = parseFloat(moon.style.width);
-           const parentDiameter = parseFloat(parentElement.style.width);
-           
-           // Calculate position based on orbit radius and angle
-           const moonX = radius * Math.cos(angle);
-           const moonY = radius * Math.sin(angle);
-           
-           // Position centered on parent and offset by orbit
-           moon.style.left = `${(parentDiameter - diameter) / 2 + moonX}px`;
-           moon.style.top = `${(parentDiameter - diameter) / 2 + moonY}px`;
-       });
+       // Only update visible moons for better performance
+       if (currentZoom >= bodyVisibilityThresholds.moon) {
+           document.querySelectorAll('.celestial-body.moon').forEach(moon => {
+               let angle = parseFloat(moon.dataset.angle || 0);
+               const speed = parseFloat(moon.dataset.orbitSpeed || 0);
+               const radius = parseFloat(moon.dataset.adjustedRadius || moon.dataset.orbitRadius || 0);
+               
+               angle += (0.0005 * speed * deltaTime);
+               if (angle > Math.PI * 2) angle -= Math.PI * 2;
+               moon.dataset.angle = angle;
+               
+               const parentElement = moon.parentElement;
+               if (!parentElement) return;
+               
+               const diameter = parseFloat(moon.style.width);
+               const parentDiameter = parseFloat(parentElement.style.width);
+               
+               // Calculate position based on orbit radius and angle
+               const moonX = radius * Math.cos(angle);
+               const moonY = radius * Math.sin(angle);
+               
+               // Position centered on parent and offset by orbit
+               moon.style.left = `${(parentDiameter - diameter) / 2 + moonX}px`;
+               moon.style.top = `${(parentDiameter - diameter) / 2 + moonY}px`;
+           });
+       }
        
-       document.querySelectorAll('.asteroid').forEach(asteroid => {
-           let angle = parseFloat(asteroid.dataset.angle || 0);
-           const speed = parseFloat(asteroid.dataset.orbitSpeed || 0);
-           const radius = parseFloat(asteroid.dataset.radius || 0);
+       // Only animate asteroids when zoomed in enough to see them
+       if (currentZoom >= bodyVisibilityThresholds.asteroid) {
+           // Use batch processing to limit DOM updates
+           const updates = [];
            
-           angle += (0.0002 * speed * deltaTime);
-           if (angle > Math.PI * 2) angle -= Math.PI * 2;
-           asteroid.dataset.angle = angle;
+           document.querySelectorAll('.asteroid').forEach(asteroid => {
+               let angle = parseFloat(asteroid.dataset.angle || 0);
+               const speed = parseFloat(asteroid.dataset.orbitSpeed || 0);
+               const radius = parseFloat(asteroid.dataset.radius || 0);
+               
+               angle += (0.0002 * speed * deltaTime);
+               if (angle > Math.PI * 2) angle -= Math.PI * 2;
+               asteroid.dataset.angle = angle;
+               
+               const size = parseFloat(asteroid.style.width);
+               const x = systemCenter.x + Math.cos(angle) * radius;
+               const y = systemCenter.y + Math.sin(angle) * radius;
+               
+               updates.push({
+                   element: asteroid,
+                   left: `${x - size/2}px`,
+                   top: `${y - size/2}px`
+               });
+           });
            
-           const size = parseFloat(asteroid.style.width);
-           const x = systemCenter.x + Math.cos(angle) * radius;
-           const y = systemCenter.y + Math.sin(angle) * radius;
-           
-           asteroid.style.left = `${x - size/2}px`;
-           asteroid.style.top = `${y - size/2}px`;
-       });
+           // Apply all position updates at once to batch reflows
+           updates.forEach(update => {
+               update.element.style.left = update.left;
+               update.element.style.top = update.top;
+           });
+       }
        
+       // Update visible tooltips
        document.querySelectorAll('.tooltip').forEach(tooltip => {
            if (tooltip.style.display === 'block') {
                tooltip.style.transform = `scale(${1/currentZoom})`;
            }
        });
        
-       requestAnimationFrame(animateCelestialBodies);
+       // Request next frame
+       animationFrameId = requestAnimationFrame(animateCelestialBodies);
    }
    
+   // Zoom controls
    document.getElementById('zoom-in').addEventListener('click', function() {
        currentZoom = Math.min(currentZoom * 1.2, maxZoom);
        updateTransform();
@@ -1026,7 +901,7 @@ document.addEventListener('DOMContentLoaded', function() {
        updateTransform();
    });
    
-   // Replace the mousedown event listener around line 304-309
+   // Mouse events for dragging
    solarSystem.addEventListener('mousedown', function(e) {
        // Only allow dragging when zoomed in
        if (currentZoom > minZoom) {
@@ -1050,7 +925,7 @@ document.addEventListener('DOMContentLoaded', function() {
        isDragging = false;
    });
    
-   // Replace the wheel event listener around line 323-352
+   // Mouse wheel for zooming
    document.addEventListener('wheel', function(e) {
        e.preventDefault();
        
@@ -1087,7 +962,9 @@ document.addEventListener('DOMContentLoaded', function() {
        updateTransform();
    }, { passive: false });
    
+   // Touch events for mobile
    let touchStartX, touchStartY, touchStartDist;
+   let lastTouchEnd = 0;
    
    solarSystem.addEventListener('touchstart', function(e) {
        if (e.touches.length === 1) {
@@ -1125,6 +1002,16 @@ document.addEventListener('DOMContentLoaded', function() {
    }, { passive: false });
    
    document.addEventListener('touchend', function(e) {
+       // Handle double tap to reset zoom
+       const now = Date.now();
+       if (now - lastTouchEnd <= 300) {
+           currentZoom = minZoom;
+           currentX = 0;
+           currentY = 0;
+           updateTransform();
+       }
+       lastTouchEnd = now;
+       
        if (e.touches.length < 1) {
            isDragging = false;
        }
@@ -1133,14 +1020,17 @@ document.addEventListener('DOMContentLoaded', function() {
        }
    });
    
+   // Initialize the visualization
    createCelestialBodies();
-   requestAnimationFrame(animateCelestialBodies);
+   animationFrameId = requestAnimationFrame(animateCelestialBodies);
    
+   // Set initial info panel content
    const infoPanel = document.getElementById('info-panel');
    if (infoPanel && infoPanel.querySelector('h2')) {
        infoPanel.querySelector('h2').textContent = 'Sol';
    }
    
+   // Remove loading screen
    const loadingScreen = document.getElementById('loading');
    if (loadingScreen) {
        loadingScreen.style.opacity = '0';
@@ -1150,8 +1040,16 @@ document.addEventListener('DOMContentLoaded', function() {
    }
    
    console.log("Initialization complete");
+   
+   // Clean up on page unload
+   window.addEventListener('beforeunload', function() {
+       if (animationFrameId) {
+           cancelAnimationFrame(animationFrameId);
+       }
+   });
 });
 
+// Fallback for loading screen removal
 window.addEventListener('load', function() {
    setTimeout(() => {
        const loadingScreen = document.getElementById('loading');
