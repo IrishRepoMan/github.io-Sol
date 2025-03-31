@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sol</title>
+    <title>Sol - Solar System Explorer</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Add metadata -->
+    <meta name="description" content="Interactive exploration of the Sol system in the year 2990">
+    <!-- Optimize rendering -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Prevent touch delay on mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <body>
     <!-- Loading indicator -->
@@ -35,12 +41,13 @@
         </div>
         
         <div id="controls">
-            <button id="zoom-in">+</button>
-            <button id="zoom-out">-</button>
-            <button id="reset">Reset View</button>
+            <button id="zoom-in" aria-label="Zoom In">+</button>
+            <button id="zoom-out" aria-label="Zoom Out">-</button>
+            <button id="reset" aria-label="Reset View">Reset View</button>
         </div>
     </div>
     
-    <script src="script.js"></script>
+    <!-- Defer script loading for better page load performance -->
+    <script src="script.js" defer></script>
 </body>
 </html>
