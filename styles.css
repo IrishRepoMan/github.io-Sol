@@ -440,3 +440,19 @@ body, html {
     background: linear-gradient(30deg, #8888aa, #9999bb, #aaaacc);
     box-shadow: 0 0 5px rgba(153, 153, 187, 0.7);
 }
+.celestial-body[data-body-type="tinymoon"] {
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
+}
+
+.celestial-body[data-body-type="tinymoon"]:hover {
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+    z-index: 1000 !important;
+}
+
+.celestial-body[data-body-type="tinymoon"] .body-content {
+    background-color: #999999;
+}
+
+.moon-orbit[data-moon-type="tinymoon"] {
+    border: 1px dotted rgba(255, 255, 255, 0.2);
+}
