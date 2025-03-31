@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const systemSize = 5000;
     
     function updateTransform() {
-        // Allow panning at all zoom levels
         const maxPan = 2500;
         currentX = Math.max(Math.min(currentX, maxPan), -maxPan);
         currentY = Math.max(Math.min(currentY, maxPan), -maxPan);
@@ -103,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body.style.display = 'block';
             }
             
-            let scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.5)));
+            let scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.5));
             
             if (bodyContent) {
                 bodyContent.style.transform = `scale(${scaleFactor})`;
@@ -125,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 moon.style.display = 'none';
             }
             
-            let scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.3)));
+            let scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.3));
             
             if (bodyContent) {
                 bodyContent.style.transform = `scale(${scaleFactor})`;
@@ -144,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 moon.style.display = 'none';
             }
             
-            let scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.3)));
+            let scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.3));
             const bodyContent = moon.querySelector('.body-content');
             if (bodyContent) {
                 bodyContent.style.transform = `scale(${scaleFactor})`;
@@ -345,6 +344,28 @@ document.addEventListener('DOMContentLoaded', function() {
             inclination: 0.05,
             orbitGroup: 2
         },
+         {
+            name: "Metis",
+            diameter: 3,
+            orbitRadius: 22,
+            orbitSpeed: 2.4,
+            parentBody: "Jupiter",
+            color: "#cc8866",
+            type: "smallmoon",
+            inclination: 0.04,
+            orbitGroup: 2
+        },
+        {
+            name: "Adrastea",
+            diameter: 2,
+            orbitRadius: 24,
+            orbitSpeed: 2.3,
+            parentBody: "Jupiter",
+            color: "#dd9944",
+            type: "smallmoon",
+            inclination: 0.03,
+            orbitGroup: 2
+        },
         {
             name: "Himalia",
             diameter: 3,
@@ -450,6 +471,30 @@ document.addEventListener('DOMContentLoaded', function() {
             inclination: 0.04,
             orbitGroup: 2
         },
+         {
+            name: "Hyperion",
+            diameter: 5,
+            orbitRadius: 95,
+            orbitSpeed: 0.5,
+            parentBody: "Saturn",
+            color: "#aabbcc",
+            description: "Chaotically tumbling moon with sponge-like appearance",
+            type: "smallmoon",
+            inclination: 0.04,
+            orbitGroup: 3
+        },
+        {
+            name: "Phoebe",
+            diameter: 4,
+            orbitRadius: 110,
+            orbitSpeed: 0.4,
+            parentBody: "Saturn", 
+            color: "#778899",
+            type: "smallmoon",
+            inclination: 0.15,
+            orbitGroup: 3
+        },
+
         {
             name: "Uranus",
             diameter: 70,
@@ -520,8 +565,19 @@ document.addEventListener('DOMContentLoaded', function() {
             inclination: 0.07,
             orbitGroup: 2
         },
+         {
+            name: "Puck",
+            diameter: 3,
+            orbitRadius: 28,
+            orbitSpeed: 1.4,
+            parentBody: "Uranus",
+            color: "#aaccaa",
+            type: "smallmoon",
+            inclination: 0.05,
+            orbitGroup: 2
+        },
         {
-            name: "Neptune",
+                        name: "Neptune",
             diameter: 68,
             orbitRadius: 2100,
             orbitSpeed: 0.006,
@@ -567,6 +623,28 @@ document.addEventListener('DOMContentLoaded', function() {
             inclination: 0.12,
             orbitGroup: 3
         },
+         {
+            name: "Larissa",
+            diameter: 4,
+            orbitRadius: 35,
+            orbitSpeed: 1.2,
+            parentBody: "Neptune",
+            color: "#99aacc",
+            type: "smallmoon",
+            inclination: 0.04,
+            orbitGroup: 2
+        },
+        {
+            name: "Galatea",
+            diameter: 3,
+            orbitRadius: 32,
+            orbitSpeed: 1.3,
+            parentBody: "Neptune",
+            color: "#8899bb",
+            type: "smallmoon",
+            inclination: 0.03,
+            orbitGroup: 2
+        },
         {
             name: "Pluto",
             diameter: 16,
@@ -598,7 +676,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function createCelestialBodies() {
         console.log("Creating celestial bodies...");
         
-        // Create planets and sun
         celestialBodies.forEach(body => {
             if (body.parentBody) return;
             
@@ -689,7 +766,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Created ${body.name} at position:`, x, y);
         });
         
-        // Create moon orbit paths for each planet first
         celestialBodies.forEach(body => {
             if (!body.parentBody) return;
             
@@ -698,7 +774,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const parentDiameter = parseFloat(parentElement.style.width);
             
-            // Check if orbit already exists for this group
             if (body.orbitGroup) {
                 const existingOrbit = parentElement.querySelector(`.moon-orbit[data-orbit-group="${body.orbitGroup}"][data-parent="${body.parentBody}"]`);
                 if (existingOrbit) return;
@@ -709,17 +784,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 orbit.setAttribute('data-parent', body.parentBody);
                 orbit.setAttribute('data-moon-type', body.type || "moon");
                 
-                let orbitRadius = body.orbitRadius;
-                if (body.parentBody === "Saturn") {
-                    orbitRadius = Math.max(body.orbitRadius, parentDiameter * 0.8);
-                } else {
-                    orbitRadius = Math.max(body.orbitRadius, parentDiameter * 0.7);
-                }
-                
-                orbit.style.width = `${orbitRadius * 2}px`;
-                orbit.style.height = `${orbitRadius * 2}px`;
-                orbit.style.left = `${(parentDiameter - orbitRadius * 2) / 2}px`;
-                orbit.style.top = `${(parentDiameter - orbitRadius * 2) / 2}px`;
+                orbit.style.width = `${body.orbitRadius * 2}px`;
+                orbit.style.height = `${body.orbitRadius * 2}px`;
+                orbit.style.left = `${(parentDiameter - body.orbitRadius * 2) / 2}px`;
+                orbit.style.top = `${(parentDiameter - body.orbitRadius * 2) / 2}px`;
                 orbit.style.borderColor = 'rgba(255, 255, 255, 0.25)';
                 
                 if (body.inclination) {
@@ -730,7 +798,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Now create the moons
         celestialBodies.forEach(body => {
             if (!body.parentBody) return;
             
@@ -740,19 +807,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Calculate angle based on orbit group to avoid overlap
             let angle;
             if (body.orbitGroup) {
-                // Get all moons in this orbit group
                 const moonsInGroup = celestialBodies.filter(m => 
                     m.parentBody === body.parentBody && 
                     m.orbitGroup === body.orbitGroup
                 );
                 
-                // Find index of current moon in the group
                 const index = moonsInGroup.findIndex(m => m.name === body.name);
-                
-                // Distribute moons evenly around the orbit
                 const moonCount = moonsInGroup.length;
                 angle = (index / moonCount) * Math.PI * 2;
             } else {
@@ -769,23 +831,14 @@ document.addEventListener('DOMContentLoaded', function() {
             element.style.height = `${body.diameter}px`;
             element.style.zIndex = 60;
 
-            let orbitRadius = body.orbitRadius;
-            if (body.parentBody === "Saturn") {
-                orbitRadius = Math.max(body.orbitRadius, parentDiameter * 0.8);
-            } else {
-                orbitRadius = Math.max(body.orbitRadius, parentDiameter * 0.7);
-            }
-            body.orbitRadius = orbitRadius;
-
-            const moonX = orbitRadius * Math.cos(angle);
-            const moonY = orbitRadius * Math.sin(angle);
+            const moonX = body.orbitRadius * Math.cos(angle);
+            const moonY = body.orbitRadius * Math.sin(angle);
             element.style.left = `${(parentDiameter - body.diameter) / 2 + moonX}px`;
             element.style.top = `${(parentDiameter - body.diameter) / 2 + moonY}px`;
             
             const bodyContent = document.createElement('div');
             bodyContent.className = 'body-content';
             
-            // Only add tooltips for moons with descriptions
             if (body.description) {
                 const tooltip = document.createElement('div');
                 tooltip.className = 'tooltip';
@@ -797,50 +850,50 @@ document.addEventListener('DOMContentLoaded', function() {
             parentElement.appendChild(element);
             
             if (!body.orbitGroup) {
-    const orbit = document.createElement('div');
-    orbit.className = 'moon-orbit';
-    orbit.setAttribute('data-moon', body.name);
-    orbit.setAttribute('data-moon-type', body.type || "moon");
-    orbit.style.width = `${orbitRadius * 2}px`;
-    orbit.style.height = `${orbitRadius * 2}px`;
-    orbit.style.left = `${(parentDiameter - orbitRadius * 2) / 2}px`;
-    orbit.style.top = `${(parentDiameter - orbitRadius * 2) / 2}px`;
-    orbit.style.borderColor = 'rgba(255, 255, 255, 0.25)';
-    
-    if (body.inclination) {
-        orbit.style.transform = `rotateX(${body.inclination * 180}deg)`;
-    }
-    
-    parentElement.appendChild(orbit);
-}
+                const orbit = document.createElement('div');
+                orbit.className = 'moon-orbit';
+                orbit.setAttribute('data-moon', body.name);
+                orbit.setAttribute('data-moon-type', body.type || "moon");
+                orbit.style.width = `${body.orbitRadius * 2}px`;
+                orbit.style.height = `${body.orbitRadius * 2}px`;
+                orbit.style.left = `${(parentDiameter - body.orbitRadius * 2) / 2}px`;
+                orbit.style.top = `${(parentDiameter - body.orbitRadius * 2) / 2}px`;
+                orbit.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                
+                if (body.inclination) {
+                    orbit.style.transform = `rotateX(${body.inclination * 180}deg)`;
+                }
+                
+                parentElement.appendChild(orbit);
+            }
 
-element.addEventListener('click', function(e) {
-    e.stopPropagation();
-    window.location.href = `detail.html?body=${body.name.toLowerCase()}`;
-});
+            element.addEventListener('click', function(e) {
+                e.stopPropagation();
+                window.location.href = `detail.html?body=${body.name.toLowerCase()}`;
+            });
 
-element.addEventListener('mouseenter', function(e) {
-    if (this.querySelector('.tooltip')) {
-        this.querySelector('.tooltip').style.display = 'block';
-        this.querySelector('.tooltip').style.transform = `scale(${1/currentZoom})`;
-    }
-    e.stopPropagation();
-});
+            element.addEventListener('mouseenter', function(e) {
+                if (this.querySelector('.tooltip')) {
+                    this.querySelector('.tooltip').style.display = 'block';
+                    this.querySelector('.tooltip').style.transform = `scale(${1/currentZoom})`;
+                }
+                e.stopPropagation();
+            });
 
-element.addEventListener('mouseleave', function() {
-    if (this.querySelector('.tooltip')) {
-        this.querySelector('.tooltip').style.display = 'none';
-    }
-});
+            element.addEventListener('mouseleave', function() {
+                if (this.querySelector('.tooltip')) {
+                    this.querySelector('.tooltip').style.display = 'none';
+                }
+            });
 
-element.dataset.angle = angle;
-element.dataset.orbitSpeed = body.orbitSpeed;
-element.dataset.orbitRadius = orbitRadius;
-element.dataset.adjustedRadius = orbitRadius;
-element.dataset.parentBody = body.parentBody;
-element.dataset.orbitGroup = body.orbitGroup || "";
+            element.dataset.angle = angle;
+            element.dataset.orbitSpeed = body.orbitSpeed;
+            element.dataset.orbitRadius = body.orbitRadius;
+            element.dataset.adjustedRadius = body.orbitRadius;
+            element.dataset.parentBody = body.parentBody;
+            element.dataset.orbitGroup = body.orbitGroup || "";
 
-console.log(`Created moon ${body.name} orbiting ${body.parentBody} at relative position:`, moonX, moonY);
+            console.log(`Created moon ${body.name} orbiting ${body.parentBody} at relative position:`, moonX, moonY);
         });
         
         createAsteroidBelt();
