@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const solarSystem = document.getElementById('solar-system');
     const minZoom = 0.2;
-    const maxZoom = 4;
+    const maxZoom = 5;
     let currentZoom = 0.2;
     let isDragging = false;
     let startDragX, startDragY;
