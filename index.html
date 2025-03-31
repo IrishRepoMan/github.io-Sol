@@ -3,51 +3,530 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sol - Solar System Explorer</title>
+    <title>Sol - Celestial Body Details</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Add metadata -->
-    <meta name="description" content="Interactive exploration of the Sol system in the year 2990">
-    <!-- Optimize rendering -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- Prevent touch delay on mobile -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            overflow: auto;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+        }
+        
+        #detail-container {
+            max-width: 1000px;
+            margin: 80px auto 40px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+        }
+        
+        .detail-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 20px;
+        }
+        
+        .body-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin-right: 30px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        .back-button:hover {
+            background-color: rgba(50, 50, 50, 0.8);
+            transform: scale(1.05);
+        }
+        
+        #body-description {
+            line-height: 1.6;
+        }
+        
+        #body-description h2 {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+            color: #aaddff;
+        }
+        
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            gap: 20px;
+        }
+        
+        .stat-box {
+            background-color: rgba(50, 50, 80, 0.4);
+            border-radius: 5px;
+            padding: 15px;
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid rgba(100, 100, 150, 0.3);
+        }
+        
+        .stat-box h3 {
+            margin-top: 0;
+            color: #aaddff;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            #detail-container {
+                margin: 60px 15px 20px;
+                padding: 20px;
+            }
+            
+            .detail-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .body-image {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Loading indicator -->
-    <div id="loading">
-        <div class="spinner"></div>
-        <span>Loading Solar System...</span>
-    </div>
-
-    <div id="universe">
-        <div id="solar-system">
-            <!-- The sun -->
-            <div class="celestial-body sun" data-name="Sol">
-                <div class="body-content"></div>
-                <div class="tooltip">
-                    <h3>Sol</h3>
-                    <p>Our solar system's star, providing energy to all planets and supporting life on Earth.</p>
-                </div>
+    <button class="back-button" onclick="window.location.href='index.html'">← Back to Solar System</button>
+    
+    <div id="detail-container">
+        <div class="detail-header">
+            <div class="body-image" id="body-image"></div>
+            <div>
+                <h1 id="body-name">Loading...</h1>
+                <h3 id="body-type">Celestial Body</h3>
             </div>
-            <!-- Planets and other bodies will be added by JavaScript -->
         </div>
         
-        <!-- Information panel -->
-        <div id="info-panel">
-            <h2>Sol</h2>
-            <p>Zoom: <span id="zoom-level">20%</span></p>
-            <p>Currently viewing: <span id="current-focus">Full System</span></p>
-            <p><small>Click on any celestial body for details</small></p>
-        </div>
-        
-        <div id="controls">
-            <button id="zoom-in" aria-label="Zoom In">+</button>
-            <button id="zoom-out" aria-label="Zoom Out">-</button>
-            <button id="reset" aria-label="Reset View">Reset View</button>
+        <div id="body-description">
+            Loading details...
         </div>
     </div>
     
-    <!-- Defer script loading for better page load performance -->
-    <script src="script.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the body name from URL parameter
+            const urlParams = new URLSearch
+// Get the body name from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const bodyName = urlParams.get('body');
+            
+            if (!bodyName) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Format the name properly
+            const formattedName = bodyName.charAt(0).toUpperCase() + bodyName.slice(1);
+            document.getElementById('body-name').textContent = formattedName;
+            document.title = `Sol - ${formattedName}`;
+            
+            // Celestial bodies data - this should match your script.js data
+            const celestialBodies = [
+                {
+                    name: "Sol",
+                    diameter: 1392700,
+                    type: "Star",
+                    description: "Our solar system's star, providing energy to all planets and supporting life on Earth. In 2990 CE, Sol remains the central anchor point for human civilization, with vast energy collection arrays in Mercury's orbit harvesting its output.",
+                    color: "#fd6801",
+                    details: {
+                        composition: "Hydrogen (73%), Helium (25%), Other elements (2%)",
+                        temperature: "5,500°C surface, 15,000,000°C core",
+                        age: "4.6 billion years",
+                        notes: "Sol's energy has been harnessed through increasingly efficient collection methods over the centuries, powering humanity's expansion through the solar system."
+                    }
+                },
+                {
+                    name: "Mercury",
+                    diameter: 4879,
+                    type: "Planet",
+                    description: "The smallest and innermost planet, known for extreme environment technologies and specialized mining operations. Mercury's hostile conditions have bred a culture of technological adaptation, making it a key supplier of heat management systems and radiation shielding throughout the system.",
+                    color: "#a6a6a6",
+                    details: {
+                        composition: "Rock, metal, minimal atmosphere",
+                        temperature: "-173°C to 427°C (extreme variation)",
+                        population: "320 million (mostly in orbital habitats)",
+                        resources: "Heavy metals, rare elements, solar energy",
+                        notes: "Mercury harbors a dark secret: a massive slave-based economy that would provoke system-wide intervention if discovered."
+                    }
+                },
+                {
+                    name: "Venus",
+                    diameter: 12104,
+                    type: "Planet",
+                    description: "Earth's toxic twin with a runaway greenhouse effect, now a major mining operation under Terra's authority. Venus operations focus on extracting valuable minerals from its atmosphere and surface, shipping them throughout the system under long-standing trade agreements with Mars.",
+                    color: "#e6e600",
+                    details: {
+                        composition: "Rocky core, dense atmosphere (96% CO₂)",
+                        temperature: "462°C average surface",
+                        population: "350 billion (orbital habitats only)",
+                        resources: "Carbon compounds, sulfuric elements, atmospheric gases",
+                        notes: "Terraforming efforts have made minimal progress despite centuries of atmospheric modification attempts."
+                    }
+                },
+                {
+                    name: "Earth",
+                    diameter: 12756,
+                    type: "Planet",
+                    description: "Humanity's birthplace, now partially rewilded and serving as a biological repository with most population in orbital habitats. After centuries of ecological restoration, Earth has returned to a more natural state, with limited human presence on the surface focused on preservation and research.",
+                    color: "#3399ff",
+                    details: {
+                        composition: "Rock, water, nitrogen-oxygen atmosphere",
+                        temperature: "15°C average (restored climate)",
+                        population: "1.2 trillion (mostly in orbital habitats)",
+                        resources: "Biological diversity, water, cultural heritage",
+                        notes: "Access to Earth's surface is strictly regulated, with permits generally reserved for scientific research and ecological management."
+                    }
+                },
+                {
+                    name: "Luna",
+                    diameter: 3475,
+                    type: "Moon (Earth)",
+                    description: "Earth's moon, home to early human colonization efforts and historical sites of significance. Luna hosts numerous heritage sites marking humanity's first steps beyond Earth, carefully preserved alongside modern infrastructure supporting Earth orbital operations.",
+                    color: "#cccccc",
+                    details: {
+                        composition: "Rock, minimal volatiles",
+                        temperature: "-173°C to 127°C",
+                        resources: "Regolith, helium-3, historical significance",
+                        notes: "Luna's far side hosts sensitive astronomical instruments shielded from Earth's radio noise."
+                    }
+                },
+                {
+                    name: "Mars",
+                    diameter: 6792,
+                    type: "Planet",
+                    description: "The solar system's breadbasket with terraformed agricultural domes producing food for trillions of humans. Mars has developed a specialized society centered around efficient food production, with complex political structures based on water rights and dome management.",
+                    color: "#ff6600",
+                    details: {
+                        composition: "Rock, ice, thin CO₂ atmosphere (gradually thickening)",
+                        temperature: "-153°C to 20°C (varies greatly between domed and undomed regions)",
+                        population: "900 billion",
+                        resources: "Agriculture, water ice, terraforming expertise",
+                        notes: "Martian agricultural zones operate under a complex federation, with water access forming the basis of political power."
+                    }
+                },
+                {
+                    name: "Jupiter",
+                    diameter: 142984,
+                    type: "Gas Giant",
+                    description: "A gas giant and economic superpower controlling energy resources and advanced technologies. Jupiter's strategic position and control over helium-3 extraction has made it into a financial and technological hub with significant political influence throughout the system.",
+                    color: "#ffcc99",
+                    details: {
+                        composition: "Hydrogen, helium, ammonia clouds",
+                        temperature: "-145°C (cloud tops)",
+                        population: "480 million (orbital habitats and moons)",
+                        resources: "Helium-3, fusion technology, financial services",
+                        notes: "The Jovian Economic Alliance functions as both government and corporate entity, maintaining strict meritocratic principles in governance."
+                    }
+                },
+                {
+                    name: "Saturn",
+                    diameter: 120536,
+                    type: "Gas Giant",
+                    description: "Ringed gas giant under the control of the Outer System Empire, with strategic resource operations. Saturn's rings and moons provide crucial resources for the empire, while its distance from the inner system creates natural defensive advantages.",
+                    color: "#ffe6b3",
+                    details: {
+                        composition: "Hydrogen, helium, icy rings",
+                        temperature: "-178°C (cloud tops)",
+                        population: "Part of 320 million Outer System Empire",
+                        resources: "Water ice, hydrocarbons from Titan, ring minerals",
+                        notes: "The imperial capital on Titan manages operations throughout Saturn, Uranus, and Neptune under a Byzantine political structure."
+                    }
+                },
+                {
+                    name: "Uranus",
+                    diameter: 51118,
+                    type: "Ice Giant",
+                    description: "Ice giant under Outer System Empire control with specialized gas extraction operations. Uranus provides crucial resources for the empire while maintaining a relatively small permanent population concentrated on a few moons.",
+                    color: "#77ccff",
+                    details: {
+                        composition: "Hydrogen, helium, methane (creates blue color)",
+                        temperature: "-224°C (cloud tops)",
+                        population: "Part of 320 million Outer System Empire",
+                        resources: "Methane, gas extraction, specialized cold chemistry",
+                        notes: "Uranus was the site of the only major military conflict between Jupiter and the Outer System Empire, resolved through the Treaty of Oberon in 2425."
+                    }
+                },
+                {
+                    name: "Neptune",
+                    diameter: 49528,
+                    type: "Ice Giant",
+                    description: "The outermost gas giant controlled by the Outer System Empire, with deuterium and tritium extraction facilities. Neptune's unique chemical composition provides resources found nowhere else in the system, giving the empire leverage in certain specialized markets.",
+                    color: "#3366ff",
+                    details: {
+                        composition: "Hydrogen, helium, methane (deeper blue than Uranus)",
+                        temperature: "-218°C (cloud tops)",
+                        population: "Part of 320 million Outer System Empire",
+                        resources: "Deuterium, tritium, specialized atmospheric compounds",
+                        notes: "Neptune's isolation makes it both the most secure imperial territory and the most challenging to supply."
+                    }
+                },
+                {
+                    name: "Pluto",
+                    diameter: 2376,
+                    type: "Dwarf Planet",
+                    description: "Dwarf planet serving as humanity's forward scientific observatory, accessible to all factions for research. Under longstanding agreements, Pluto operates as neutral scientific territory with representatives from all major powers contributing to and benefiting from its research.",
+                    color: "#ccb399",
+                    details: {
+                        composition: "Rock, water ice, nitrogen ice",
+                        temperature: "-233°C average",
+                        population: "15,000-20,000 (primarily researchers)",
+                        resources: "Scientific data, neutral meeting ground",
+                        notes: "Pluto's scientific community focuses heavily on potential interstellar travel methods following three failed attempts to reach nearby star systems."
+                    }
+                },
+                // Moons
+                {
+                    name: "Phobos",
+                    diameter: 22.2,
+                    type: "Moon (Mars)",
+                    description: "Mars' larger moon, now home to orbital transfer stations and habitat construction facilities.",
+                    color: "#aaaaaa",
+                    details: {
+                        composition: "Porous rock, likely captured asteroid",
+                        temperature: "-40°C (average)",
+                        population: "60,000 (primarily service personnel)",
+                        resources: "Construction facilities, transfer stations",
+                        notes: "Phobos serves as a major transit hub for Martian agricultural exports."
+                    }
+                },
+                {
+                    name: "Deimos",
+                    diameter: 12.4,
+                    type: "Moon (Mars)",
+                    description: "Mars' smaller moon, hosting observatories and communication relay stations.",
+                    color: "#999999",
+                    details: {
+                        composition: "Carbonaceous rock",
+                        temperature: "-40°C (average)",
+                        population: "20,000",
+                        resources: "Communication relays, observation posts",
+                        notes: "Deimos hosts Mars' primary deep space communication array."
+                    }
+                },
+                {
+                    name: "Io",
+                    diameter: 3643,
+                    type: "Moon (Jupiter)",
+                    description: "Jupiter's volcanically active moon with specialized mining operations.",
+                    color: "#ffffaa",
+                    details: {
+                        composition: "Silicate rock, sulfur compounds",
+                        temperature: "-130°C to 2000°C (at volcanic vents)",
+                        population: "120,000 (mostly in protected habitats)",
+                        resources: "Rare minerals from volcanic activity",
+                        notes: "Io's extreme radiation environment requires specialized shielding for all habitats."
+                    }
+                },
+                {
+                    name: "Europa",
+                    diameter: 3122,
+                    type: "Moon (Jupiter)",
+                    description: "Jupiter's ice-covered moon with subsurface ocean, hosting scientific outposts.",
+                    color: "#ffffee",
+                    details: {
+                        composition: "Water ice crust, subsurface ocean",
+                        temperature: "-160°C (surface)",
+                        population: "80,000 (research personnel)",
+                        resources: "Water, unique biological research",
+                        notes: "Europa's subsurface ocean remains the site of ongoing xenobiology research."
+                    }
+                },
+                {
+                    name: "Ganymede",
+                    diameter: 5268,
+                    type: "Moon (Jupiter)",
+                    description: "Jupiter's largest moon and an important administrative center for Jovian operations.",
+                    color: "#cccccc",
+                    details: {
+                        composition: "Rock, water ice",
+                        temperature: "-160°C (average)",
+                        population: "200,000",
+                        resources: "Administrative facilities, Jovian shipyards",
+                        notes: "Ganymede hosts the primary administrative facilities for the Jovian Economic Alliance."
+                    }
+                },
+                {
+                    name: "Callisto",
+                    diameter: 4821,
+                    type: "Moon (Jupiter)",
+                    description: "Jupiter's outermost large moon with significant habitat development.",
+                    color: "#999999",
+                    details: {
+                        composition: "Rock, water ice",
+                        temperature: "-155°C (average)",
+                        population: "120,000",
+                        resources: "Water ice, orbital habitats",
+                        notes: "Callisto's distance from Jupiter's radiation belts makes it ideal for residential development."
+                    }
+                },
+                {
+                    name: "Titan",
+                    diameter: 5150,
+                    type: "Moon (Saturn)",
+                    description: "Saturn's largest moon and the administrative center of the Outer System Empire.",
+                    color: "#e6b800",
+                    details: {
+                        composition: "Rock core, water ice, methane lakes",
+                        temperature: "-180°C (average)",
+                        population: "150,000",
+                        resources: "Hydrocarbons, imperial governance",
+                        notes: "Titan hosts the imperial palace and central governance structures of the Outer System Empire."
+                    }
+                },
+                {
+                    name: "Enceladus",
+                    diameter: 504,
+                    type: "Moon (Saturn)",
+                    description: "An icy moon with subsurface ocean, known for water harvesting operations.",
+                    color: "#ffffff",
+                    details: {
+                        composition: "Water ice, subsurface ocean",
+                        temperature: "-198°C (average)",
+                        population: "30,000",
+                        resources: "Fresh water, research facilities",
+                        notes: "Enceladus provides much of the water used throughout Saturn's orbital habitats."
+                    }
+                },
+                {
+                    name: "Triton",
+                    diameter: 2707,
+                    type: "Moon (Neptune)",
+                    description: "Neptune's largest moon with significant imperial presence and specialized manufacturing.",
+                    color: "#ccccff",
+                    details: {
+                        composition: "Nitrogen ice, water ice, rock",
+                        temperature: "-235°C (average)",
+                        population: "40,000",
+                        resources: "Rare materials, cold chemistry facilities",
+                        notes: "Triton is believed to be a captured Kuiper Belt object, with unique composition compared to other system bodies."
+                    }
+                },
+                {
+                    name: "Charon",
+                    diameter: 1212,
+                    type: "Moon (Pluto)",
+                    description: "Pluto's largest moon, functioning as an extension of the scientific outpost.",
+                    color: "#bbaa99",
+                    details: {
+                        composition: "Water ice, rock",
+                        temperature: "-230°C (average)",
+                        population: "5,000",
+                        resources: "Research facilities, communications",
+                        notes: "Charon hosts much of the infrastructure supporting Pluto's scientific operations."
+                    }
+                }
+                // Additional bodies can be added here as needed
+            ];
+            
+            // Find the data for the requested body
+            const bodyData = celestialBodies.find(body => 
+                body.name.toLowerCase() === bodyName.toLowerCase()
+            );
+            
+            if (bodyData) {
+                // Set the body type
+                document.getElementById('body-type').textContent = bodyData.type;
+                
+                // Set the body image background color
+                const bodyImage = document.getElementById('body-image');
+                bodyImage.style.backgroundColor = bodyData.color;
+                
+                // Add appropriate styling based on the body type
+                if (bodyData.name === "Sol") {
+                    bodyImage.style.background = "radial-gradient(circle at 30% 30%, #ffdb8c, #ff9500 40%, #fd6801 60%, #a64203)";
+                    bodyImage.style.boxShadow = "0 0 50px rgba(255, 160, 60, 0.8)";
+                } else if (bodyData.name === "Saturn") {
+                    // Add rings to Saturn
+                    bodyImage.style.position = "relative";
+                    const rings = document.createElement('div');
+                    rings.style.position = "absolute";
+                    rings.style.width = "300px";
+                    rings.style.height = "30px";
+                    rings.style.backgroundColor = "rgba(210, 180, 140, 0.7)";
+                    rings.style.left = "-50px";
+                    rings.style.top = "85px";
+                    rings.style.transform = "rotateX(75deg)";
+                    rings.style.borderRadius = "50%";
+                    bodyImage.appendChild(rings);
+                }
+                
+                // Populate the description
+                let descriptionHTML = `
+                    <p>${bodyData.description}</p>
+                    
+                    <div class="stats-container">
+                        <div class="stat-box">
+                            <h3>Physical Characteristics</h3>
+                            <p><strong>Diameter:</strong> ${bodyData.diameter.toLocaleString()} km</p>
+                            <p><strong>Composition:</strong> ${bodyData.details.composition}</p>
+                            <p><strong>Temperature:</strong> ${bodyData.details.temperature}</p>
+                        </div>
+                `;
+                
+                if (bodyData.details.population) {
+                    descriptionHTML += `
+                        <div class="stat-box">
+                            <h3>Population</h3>
+                            <p><strong>Total:</strong> ${bodyData.details.population}</p>
+                        </div>
+                    `;
+                }
+                
+                descriptionHTML += `
+                    <div class="stat-box">
+                        <h3>Resources</h3>
+                        <p>${bodyData.details.resources}</p>
+                    </div>
+                `;
+                
+                descriptionHTML += `
+                    </div>
+                    
+                    <h2>Current Status</h2>
+                    <p>${bodyData.details.notes}</p>
+                    
+                    <h2>Historical Significance</h2>
+                    <p>This section contains detailed historical information about ${bodyData.name}'s role in human expansion throughout the solar system.</p>
+                    
+                    <h2>In Human Culture</h2>
+                    <p>By the 30th century, ${bodyData.name} has developed a unique place in human culture, arts, and society.</p>
+                `;
+                
+                document.getElementById('body-description').innerHTML = descriptionHTML;
+            } else {
+                // Handle case where the body isn't found
+                document.getElementById('body-description').innerHTML = `
+                    <p>No information available for ${formattedName}. Please return to the solar system view.</p>
+                `;
+            }
+        });
+    </script>
 </body>
 </html>
