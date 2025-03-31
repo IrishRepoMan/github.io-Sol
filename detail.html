@@ -285,7 +285,7 @@
                     notes: "Pluto's scientific community focuses heavily on potential interstellar travel methods following three failed attempts to reach nearby star systems."
                 }
             },
-            // Major moons - condensed list for performance
+            // Major moons
             {
                 name: "Phobos",
                 diameter: 22.2,
@@ -298,6 +298,20 @@
                     population: "60,000 (primarily service personnel)",
                     resources: "Construction facilities, transfer stations",
                     notes: "Phobos serves as a major transit hub for Martian agricultural exports."
+                }
+            },
+            {
+                name: "Deimos",
+                diameter: 12.4,
+                type: "Moon (Mars)",
+                description: "Mars' smaller moon, hosting observatories and communication relay stations.",
+                color: "#999999",
+                details: {
+                    composition: "Porous rock, likely captured asteroid",
+                    temperature: "-40°C (average)",
+                    population: "25,000",
+                    resources: "Communication arrays, observatories",
+                    notes: "Deimos serves as a strategic communication relay point for Martian operations."
                 }
             },
             {
@@ -329,6 +343,34 @@
                 }
             },
             {
+                name: "Ganymede",
+                diameter: 5262,
+                type: "Moon (Jupiter)",
+                description: "Jupiter's largest moon and an important administrative center for Jovian operations.",
+                color: "#cccccc",
+                details: {
+                    composition: "Rock core, water ice mantle",
+                    temperature: "-163°C (average)",
+                    population: "180,000",
+                    resources: "Water ice, administrative facilities",
+                    notes: "Ganymede hosts the main administrative complex for Jovian operations."
+                }
+            },
+            {
+                name: "Callisto",
+                diameter: 4821,
+                type: "Moon (Jupiter)",
+                description: "Jupiter's outermost large moon with significant habitat development.",
+                color: "#999999",
+                details: {
+                    composition: "Rock, ice, thin atmosphere",
+                    temperature: "-139°C (average)",
+                    population: "150,000",
+                    resources: "Water ice, minerals",
+                    notes: "Callisto's distance from Jupiter's radiation belts makes it suitable for larger habitat development."
+                }
+            },
+            {
                 name: "Titan",
                 diameter: 5150,
                 type: "Moon (Saturn)",
@@ -354,6 +396,91 @@
                     population: "40,000",
                     resources: "Rare materials, cold chemistry facilities",
                     notes: "Triton is believed to be a captured Kuiper Belt object, with unique composition compared to other system bodies."
+                }
+            },
+            {
+                name: "Charon",
+                diameter: 1212,
+                type: "Moon (Pluto)",
+                description: "Pluto's largest moon, housing additional research facilities and living quarters.",
+                color: "#bbaa99",
+                details: {
+                    composition: "Water ice, rock",
+                    temperature: "-233°C (average)",
+                    population: "5,000 (research personnel)",
+                    resources: "Research facilities, astronomical arrays",
+                    notes: "Charon's tidally-locked orbit with Pluto creates a stable platform for sensitive scientific equipment."
+                }
+            },
+            // New entries for additional major moons
+            {
+                name: "Titania",
+                diameter: 1578,
+                type: "Moon (Uranus)",
+                description: "Uranus' largest moon with major gas processing facilities.",
+                color: "#aaaaaa",
+                details: {
+                    composition: "Water ice, rock",
+                    temperature: "-226°C (average)",
+                    population: "35,000",
+                    resources: "Gas processing facilities, imperial outpost",
+                    notes: "Titania hosts the primary gas extraction administration for Uranian operations."
+                }
+            },
+            {
+                name: "Oberon",
+                diameter: 1523,
+                type: "Moon (Uranus)",
+                description: "Site of the historic Treaty of Oberon that ended the Uranus Conflict.",
+                color: "#999999",
+                details: {
+                    composition: "Water ice, rock",
+                    temperature: "-226°C (average)",
+                    population: "30,000",
+                    resources: "Historical significance, military facilities",
+                    notes: "The Treaty Chamber remains preserved as a historical monument while modern facilities operate around it."
+                }
+            },
+            {
+                name: "Rhea",
+                diameter: 1528,
+                type: "Moon (Saturn)",
+                description: "Saturn's second-largest moon, hosting imperial military installations.",
+                color: "#dddddd",
+                details: {
+                    composition: "Water ice, rock",
+                    temperature: "-197°C (average)",
+                    population: "45,000",
+                    resources: "Military facilities, ice mining",
+                    notes: "Rhea serves as a strategic military hub for the Outer System Empire's defense network."
+                }
+            },
+            {
+                name: "Iapetus",
+                diameter: 1469,
+                type: "Moon (Saturn)",
+                description: "Distinctive two-toned moon with important surveillance outposts.",
+                color: "#bbbbbb",
+                details: {
+                    composition: "Water ice, dark organic material",
+                    temperature: "-197°C (average)",
+                    population: "20,000",
+                    resources: "Surveillance installations, research facilities",
+                    notes: "Iapetus's unique two-toned surface and distant orbit make it an ideal location for deep space surveillance."
+                }
+            },
+            {
+                name: "Enceladus",
+                diameter: 504,
+                type: "Moon (Saturn)",
+                description: "An icy moon with subsurface ocean, known for water harvesting operations.",
+                color: "#ffffff",
+                details: {
+                    composition: "Water ice, subsurface ocean",
+                    temperature: "-198°C (average)",
+                    population: "15,000",
+                    resources: "Water harvesting, research facilities",
+                    notes: "Enceladus's water geysers are harvested directly, providing a significant portion of Saturn's orbital water supply."
                 }
             }
         ];
@@ -400,6 +527,27 @@
                     rings.style.backgroundColor = "rgba(210, 180, 140, 0.7)";
                     rings.style.left = "-50px";
                     rings.style.top = "85px";
+                    rings.style.transform = "rotateX(75deg)";
+                    rings.style.borderRadius = "50%";
+                    bodyImage.appendChild(rings);
+                } else if (bodyData.name === "Jupiter" || bodyData.name === "Uranus" || bodyData.name === "Neptune") {
+                    // Add subtle rings to the gas giants
+                    bodyImage.style.position = "relative";
+                    const rings = document.createElement('div');
+                    rings.style.position = "absolute";
+                    rings.style.width = "270px";
+                    rings.style.height = "20px";
+                    
+                    if (bodyData.name === "Jupiter") {
+                        rings.style.backgroundColor = "rgba(255, 220, 180, 0.3)";
+                    } else if (bodyData.name === "Uranus") {
+                        rings.style.backgroundColor = "rgba(150, 200, 255, 0.3)";
+                    } else if (bodyData.name === "Neptune") {
+                        rings.style.backgroundColor = "rgba(100, 150, 255, 0.3)";
+                    }
+                    
+                    rings.style.left = "-35px";
+                    rings.style.top = "90px";
                     rings.style.transform = "rotateX(75deg)";
                     rings.style.borderRadius = "50%";
                     bodyImage.appendChild(rings);
