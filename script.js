@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
         planet: 0.1,
         moon: 0.3,
         asteroid: 0.5,
-        smallmoon: 0.6
+        smallmoon: 0.6,
+        tinymoon: 0.8
     };
     
     let animationFrameId = null;
@@ -82,7 +83,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Update orbit group paths
         document.querySelectorAll('.moon-orbit[data-orbit-group]').forEach(orbit => {
             const parentName = orbit.dataset.parent;
             const groupId = orbit.dataset.orbitGroup;
@@ -93,26 +93,18 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const parentDiameter = parseFloat(parentElement.style.width);
             
-            // Find the moons in this group
             const moonsInGroup = Array.from(document.querySelectorAll(`.celestial-body.moon[data-parent-body="${parentName}"][data-orbit-group="${groupId}"]`));
             if (moonsInGroup.length === 0) return;
             
-            // Use the largest orbit radius in the group
-            let largestRadius = 0;
-            moonsInGroup.forEach(moon => {
-                const radius = parseFloat(moon.dataset.orbitRadius || 0);
-                if (radius > largestRadius) largestRadius = radius;
-            });
+            let orbitRadius = parseFloat(orbit.dataset.groupRadius || 0);
             
-            // Update the orbit path
-            orbit.style.width = `${largestRadius * 2}px`;
-            orbit.style.height = `${largestRadius * 2}px`;
-            orbit.style.left = `${(parentDiameter - largestRadius * 2) / 2}px`;
-            orbit.style.top = `${(parentDiameter - largestRadius * 2) / 2}px`;
+            orbit.style.width = `${orbitRadius * 2}px`;
+            orbit.style.height = `${orbitRadius * 2}px`;
+            orbit.style.left = `${(parentDiameter - orbitRadius * 2) / 2}px`;
+            orbit.style.top = `${(parentDiameter - orbitRadius * 2) / 2}px`;
             
-            // Update all moons in this group to use the same radius
             moonsInGroup.forEach(moon => {
-                moon.dataset.adjustedRadius = largestRadius;
+                moon.dataset.adjustedRadius = orbitRadius;
             });
         });
         
@@ -123,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const planetItems = document.querySelectorAll('.celestial-body[data-body-type="planet"], .celestial-body[data-body-type="star"]');
         const moonItems = document.querySelectorAll('.celestial-body[data-body-type="moon"]');
         const smallMoonItems = document.querySelectorAll('.celestial-body[data-body-type="smallmoon"]');
+        const tinyMoonItems = document.querySelectorAll('.celestial-body[data-body-type="tinymoon"]');
         const asteroidItems = document.querySelectorAll('.asteroid');
         const orbitItems = document.querySelectorAll('.orbit');
         const moonOrbitItems = document.querySelectorAll('.moon-orbit');
@@ -174,6 +167,20 @@ document.addEventListener('DOMContentLoaded', function() {
         
         smallMoonItems.forEach(moon => {
             if (currentZoom >= bodyVisibilityThresholds.smallmoon) {
+                moon.style.display = 'block';
+            } else {
+                moon.style.display = 'none';
+            }
+            
+            let scaleFactor = Math.max(0.5, Math.min(1, 1 / (currentZoom * 1.3)));
+            const bodyContent = moon.querySelector('.body-content');
+            if (bodyContent) {
+                bodyContent.style.transform = `scale(${scaleFactor})`;
+            }
+        });
+        
+        tinyMoonItems.forEach(moon => {
+            if (currentZoom >= bodyVisibilityThresholds.tinymoon) {
                 moon.style.display = 'block';
             } else {
                 moon.style.display = 'none';
@@ -290,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
             name: "Phobos",
             diameter: 6,
             orbitRadius: 18,
-            orbitSpeed: 3,
+            orbitSpeed: 2.0,
             parentBody: "Mars",
             color: "#aaaaaa",
             description: "Mars' larger moon, now home to orbital transfer stations and habitat construction facilities.",
@@ -301,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
             name: "Deimos",
             diameter: 4,
             orbitRadius: 26,
-            orbitSpeed: 2,
+            orbitSpeed: 1.5,
             parentBody: "Mars",
             color: "#999999",
             description: "Mars' smaller moon, hosting observatories and communication relay stations.",
@@ -321,35 +328,12 @@ document.addEventListener('DOMContentLoaded', function() {
             ringWidth: 20,
             ringColor: "rgba(255, 220, 180, 0.3)"
         },
-        {
-            name: "Io",
-            diameter: 10,
-            orbitRadius: 35,
-            orbitSpeed: 1.8,
-            parentBody: "Jupiter",
-            color: "#ffffaa",
-            description: "Jupiter's volcanically active moon with specialized mining operations.",
-            type: "moon",
-            inclination: 0.05,
-            orbitGroup: 1
-        },
-        {
-            name: "Europa",
-            diameter: 10,
-            orbitRadius: 45,
-            orbitSpeed: 1.4,
-            parentBody: "Jupiter",
-            color: "#ffffee",
-            description: "Jupiter's ice-covered moon with subsurface ocean, hosting scientific outposts.",
-            type: "moon",
-            inclination: 0.02,
-            orbitGroup: 1
-        },
+        // Jupiter Moon Groups (79 known moons)
+        // Group 1 - Largest Galilean moons (outermost)
         {
             name: "Ganymede",
             diameter: 15,
-            orbitRadius: 60,
-            orbitSpeed: 1.0,
+            orbitSpeed: 0.5,
             parentBody: "Jupiter",
             color: "#cccccc",
             description: "Jupiter's largest moon and an important administrative center for Jovian operations.",
@@ -360,8 +344,7 @@ document.addEventListener('DOMContentLoaded', function() {
         {
             name: "Callisto",
             diameter: 14,
-            orbitRadius: 75,
-            orbitSpeed: 0.8,
+            orbitSpeed: 0.5,
             parentBody: "Jupiter",
             color: "#999999",
             description: "Jupiter's outermost large moon with significant habitat development.",
@@ -370,25 +353,119 @@ document.addEventListener('DOMContentLoaded', function() {
             orbitGroup: 1
         },
         {
+            name: "Io",
+            diameter: 12,
+            orbitSpeed: 0.5,
+            parentBody: "Jupiter",
+            color: "#ffffaa",
+            description: "Jupiter's volcanically active moon with specialized mining operations.",
+            type: "moon",
+            inclination: 0.05,
+            orbitGroup: 1
+        },
+        {
+            name: "Europa",
+            diameter: 10,
+            orbitSpeed: 0.5,
+            parentBody: "Jupiter",
+            color: "#ffffee",
+            description: "Jupiter's ice-covered moon with subsurface ocean, hosting scientific outposts.",
+            type: "moon",
+            inclination: 0.02,
+            orbitGroup: 1
+        },
+        // Group 2 - Medium moons
+        {
             name: "Amalthea",
-            diameter: 4,
-            orbitRadius: 25,
-            orbitSpeed: 2.2,
+            diameter: 5,
+            orbitSpeed: 1.0,
             parentBody: "Jupiter",
             color: "#cc6644",
+            description: "Small inner moon of Jupiter used for observation stations.",
             type: "smallmoon",
             inclination: 0.05,
             orbitGroup: 2
         },
         {
             name: "Himalia",
-            diameter: 3,
-            orbitRadius: 90,
-            orbitSpeed: 0.4,
+            diameter: 5,
+            orbitSpeed: 1.0,
             parentBody: "Jupiter",
             color: "#aaaaaa",
+            description: "Irregular outer moon of Jupiter with small research outposts.",
             type: "smallmoon",
             inclination: 0.10,
+            orbitGroup: 2
+        },
+        {
+            name: "Thebe",
+            diameter: 4,
+            orbitSpeed: 1.0,
+            parentBody: "Jupiter",
+            color: "#bb5533",
+            type: "smallmoon",
+            inclination: 0.08,
+            orbitGroup: 2
+        },
+        {
+            name: "Metis",
+            diameter: 4,
+            orbitSpeed: 1.0,
+            parentBody: "Jupiter",
+            color: "#bbaa99",
+            type: "smallmoon",
+            inclination: 0.06,
+            orbitGroup: 2
+        },
+        // Group 3 - Small irregular moons (innermost, faster)
+        {
+            name: "Elara",
+            diameter: 3,
+            orbitSpeed: 1.8,
+            parentBody: "Jupiter",
+            color: "#aaaaaa",
+            type: "tinymoon",
+            inclination: 0.12,
+            orbitGroup: 3
+        },
+        {
+            name: "Pasiphae",
+            diameter: 3,
+            orbitSpeed: 1.8,
+            parentBody: "Jupiter",
+            color: "#999999",
+            type: "tinymoon",
+            inclination: 0.14,
+            orbitGroup: 3
+        },
+        {
+            name: "Sinope",
+            diameter: 2,
+            orbitSpeed: 1.8,
+            parentBody: "Jupiter",
+            color: "#888888",
+            type: "tinymoon",
+            inclination: 0.15,
+            orbitGroup: 3
+        },
+        {
+            name: "Lysithea",
+            diameter: 2,
+            orbitSpeed: 1.8,
+            parentBody: "Jupiter",
+            color: "#999988",
+            type: "tinymoon",
+            inclination: 0.11,
+            orbitGroup: 3
+        },
+        {
+            name: "Carme",
+            diameter: 2,
+            orbitSpeed: 1.8,
+            parentBody: "Jupiter",
+            color: "#aa9988",
+            type: "tinymoon",
+            inclination: 0.13,
             orbitGroup: 3
         },
         {
@@ -404,11 +481,12 @@ document.addEventListener('DOMContentLoaded', function() {
             ringWidth: 40,
             ringColor: "rgba(210, 180, 140, 0.5)"
         },
+        // Saturn Moon Groups (82 known moons)
+        // Group 1 - Largest moons (outermost)
         {
             name: "Titan",
             diameter: 16,
-            orbitRadius: 60,
-            orbitSpeed: 0.9,
+            orbitSpeed: 0.5,
             parentBody: "Saturn",
             color: "#e6b800",
             description: "Saturn's largest moon and the administrative center of the Outer System Empire.",
@@ -418,9 +496,8 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         {
             name: "Rhea",
-            diameter: 9,
-            orbitRadius: 45,
-            orbitSpeed: 1.1,
+            diameter: 10,
+            orbitSpeed: 0.5,
             parentBody: "Saturn",
             color: "#dddddd",
             description: "Saturn's second-largest moon, hosting imperial military installations.",
@@ -430,9 +507,8 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         {
             name: "Iapetus",
-            diameter: 8,
-            orbitRadius: 85,
-            orbitSpeed: 0.6,
+            diameter: 9,
+            orbitSpeed: 0.5,
             parentBody: "Saturn",
             color: "#bbbbbb",
             description: "Distinctive two-toned moon with important surveillance outposts.",
@@ -442,31 +518,31 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         {
             name: "Dione",
-            diameter: 7,
-            orbitRadius: 40,
-            orbitSpeed: 1.3,
+            diameter: 8,
+            orbitSpeed: 0.5,
             parentBody: "Saturn",
             color: "#cccccc",
-            type: "smallmoon",
+            description: "Icy moon of Saturn with small imperial military presence.",
+            type: "moon",
             inclination: 0.04,
-            orbitGroup: 2
+            orbitGroup: 1
         },
         {
             name: "Tethys",
-            diameter: 7,
-            orbitRadius: 35,
-            orbitSpeed: 1.4,
+            diameter: 8,
+            orbitSpeed: 0.5,
             parentBody: "Saturn",
             color: "#dddddd",
-            type: "smallmoon",
+            description: "Mid-sized icy moon of Saturn with multiple research stations.",
+            type: "moon",
             inclination: 0.03,
-            orbitGroup: 2
+            orbitGroup: 1
         },
+        // Group 2 - Medium moons
         {
             name: "Enceladus",
-            diameter: 5,
-            orbitRadius: 30,
-            orbitSpeed: 1.5,
+            diameter: 6,
+            orbitSpeed: 1.0,
             parentBody: "Saturn",
             color: "#ffffff",
             description: "An icy moon with subsurface ocean, known for water harvesting operations.",
@@ -476,14 +552,85 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         {
             name: "Mimas",
-            diameter: 4,
-            orbitRadius: 25,
-            orbitSpeed: 1.7,
+            diameter: 5,
+            orbitSpeed: 1.0,
             parentBody: "Saturn",
             color: "#bbbbbb",
+            description: "Small moon of Saturn known for its distinctive large crater.",
             type: "smallmoon",
             inclination: 0.04,
             orbitGroup: 2
+        },
+        {
+            name: "Hyperion",
+            diameter: 5,
+            orbitSpeed: 1.0,
+            parentBody: "Saturn",
+            color: "#aa9988",
+            type: "smallmoon",
+            inclination: 0.07,
+            orbitGroup: 2
+        },
+        {
+            name: "Phoebe",
+            diameter: 4,
+            orbitSpeed: 1.0,
+            parentBody: "Saturn",
+            color: "#888888",
+            type: "smallmoon",
+            inclination: 0.15,
+            orbitGroup: 2
+        },
+        // Group 3 - Small irregular moons (innermost, fastest)
+        {
+            name: "Janus",
+            diameter: 3,
+            orbitSpeed: 1.8,
+            parentBody: "Saturn",
+            color: "#aaaaaa",
+            type: "tinymoon",
+            inclination: 0.05,
+            orbitGroup: 3
+        },
+        {
+            name: "Epimetheus",
+            diameter: 3,
+            orbitSpeed: 1.8,
+            parentBody: "Saturn",
+            color: "#999999",
+            type: "tinymoon",
+            inclination: 0.06,
+            orbitGroup: 3
+        },
+        {
+            name: "Prometheus",
+            diameter: 2,
+            orbitSpeed: 1.8,
+            parentBody: "Saturn",
+            color: "#aaaaaa",
+            type: "tinymoon",
+            inclination: 0.04,
+            orbitGroup: 3
+        },
+        {
+            name: "Pandora",
+            diameter: 2,
+            orbitSpeed: 1.8,
+            parentBody: "Saturn",
+            color: "#999999",
+            type: "tinymoon",
+            inclination: 0.05,
+            orbitGroup: 3
+        },
+        {
+            name: "Helene",
+            diameter: 2,
+            orbitSpeed: 1.8,
+            parentBody: "Saturn",
+            color: "#bbbbbb",
+            type: "tinymoon",
+            inclination: 0.06,
+            orbitGroup: 3
         },
         {
             name: "Uranus",
@@ -498,11 +645,12 @@ document.addEventListener('DOMContentLoaded', function() {
             ringWidth: 20,
             ringColor: "rgba(150, 200, 255, 0.3)"
         },
+        // Uranus Moon Groups (27 known moons)
+        // Group 1 - Largest moons (outermost)
         {
             name: "Titania",
             diameter: 8,
-            orbitRadius: 40,
-            orbitSpeed: 1.0,
+            orbitSpeed: 0.5,
             parentBody: "Uranus",
             color: "#aaaaaa",
             description: "Uranus' largest moon with major gas processing facilities.",
@@ -513,8 +661,7 @@ document.addEventListener('DOMContentLoaded', function() {
         {
             name: "Oberon",
             diameter: 8,
-            orbitRadius: 45,
-            orbitSpeed: 0.9,
+            orbitSpeed: 0.5,
             parentBody: "Uranus",
             color: "#999999",
             description: "Site of the historic Treaty of Oberon that ended the Uranus Conflict.",
@@ -524,36 +671,78 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         {
             name: "Umbriel",
-            diameter: 6,
-            orbitRadius: 35,
-            orbitSpeed: 1.2,
+            diameter: 7,
+            orbitSpeed: 0.5,
             parentBody: "Uranus",
             color: "#777777",
-            type: "smallmoon",
+            description: "Dark-surfaced moon of Uranus with specialized facilities.",
+            type: "moon",
             inclination: 0.04,
-            orbitGroup: 2
+            orbitGroup: 1
         },
         {
             name: "Ariel",
-            diameter: 6,
-            orbitRadius: 30,
-            orbitSpeed: 1.3,
+            diameter: 7,
+            orbitSpeed: 0.5,
             parentBody: "Uranus",
             color: "#bbbbbb",
-            type: "smallmoon",
+            description: "Medium-sized moon of Uranus with imperial settlements.",
+            type: "moon",
             inclination: 0.03,
-            orbitGroup: 2
+            orbitGroup: 1
         },
+        // Group 2 - Medium moons
         {
             name: "Miranda",
-            diameter: 4,
-            orbitRadius: 25,
-            orbitSpeed: 1.5,
+            diameter: 5,
+            orbitSpeed: 1.0,
             parentBody: "Uranus",
             color: "#aaaaaa",
+            description: "Small, geologically diverse moon of Uranus with research outposts.",
             type: "smallmoon",
             inclination: 0.07,
             orbitGroup: 2
+        },
+        {
+            name: "Puck",
+            diameter: 4,
+            orbitSpeed: 1.0,
+            parentBody: "Uranus",
+            color: "#999999",
+            type: "smallmoon",
+            inclination: 0.05,
+            orbitGroup: 2
+        },
+        // Group 3 - Small irregular moons (innermost, fastest)
+        {
+            name: "Portia",
+            diameter: 3,
+            orbitSpeed: 1.8,
+            parentBody: "Uranus",
+            color: "#aaaaaa",
+            type: "tinymoon",
+            inclination: 0.06,
+            orbitGroup: 3
+        },
+        {
+            name: "Juliet",
+            diameter: 2,
+            orbitSpeed: 1.8,
+            parentBody: "Uranus",
+            color: "#999999",
+            type: "tinymoon",
+            inclination: 0.07,
+            orbitGroup: 3
+        },
+        {
+            name: "Desdemona",
+            diameter: 2,
+            orbitSpeed: 1.8,
+            parentBody: "Uranus",
+            color: "#888888",
+            type: "tinymoon",
+            inclination: 0.05,
+            orbitGroup: 3
         },
         {
             name: "Neptune",
@@ -568,11 +757,12 @@ document.addEventListener('DOMContentLoaded', function() {
             ringWidth: 15,
             ringColor: "rgba(100, 150, 255, 0.3)"
         },
+        // Neptune Moon Groups (14 known moons)
+        // Group 1 - Largest moons (outermost)
         {
             name: "Triton",
             diameter: 12,
-            orbitRadius: 40,
-            orbitSpeed: 1.1,
+            orbitSpeed: 0.5,
             parentBody: "Neptune",
             color: "#ccccff",
             description: "Neptune's largest moon with significant imperial presence and specialized manufacturing.",
@@ -580,13 +770,14 @@ document.addEventListener('DOMContentLoaded', function() {
             inclination: 0.08,
             orbitGroup: 1
         },
+        // Group 2 - Medium moons
         {
             name: "Proteus",
             diameter: 5,
-            orbitRadius: 30,
-            orbitSpeed: 1.3,
+            orbitSpeed: 1.0,
             parentBody: "Neptune",
             color: "#aaaacc",
+            description: "Irregularly shaped moon of Neptune with small imperial outpost.",
             type: "smallmoon",
             inclination: 0.04,
             orbitGroup: 2
@@ -594,12 +785,43 @@ document.addEventListener('DOMContentLoaded', function() {
         {
             name: "Nereid",
             diameter: 4,
-            orbitRadius: 55,
-            orbitSpeed: 0.8,
+            orbitSpeed: 1.0,
             parentBody: "Neptune",
             color: "#9999bb",
+            description: "Small, distant moon of Neptune with minimal presence.",
             type: "smallmoon",
             inclination: 0.12,
+            orbitGroup: 2
+        },
+        // Group 3 - Small irregular moons (innermost, fastest)
+        {
+            name: "Larissa",
+            diameter: 3,
+            orbitSpeed: 1.8,
+            parentBody: "Neptune",
+            color: "#9999bb",
+            type: "tinymoon",
+            inclination: 0.05,
+            orbitGroup: 3
+        },
+        {
+            name: "Galatea",
+            diameter: 2,
+            orbitSpeed: 1.8,
+            parentBody: "Neptune",
+            color: "#8888aa",
+            type: "tinymoon",
+            inclination: 0.06,
+            orbitGroup: 3
+        },
+        {
+            name: "Thalassa",
+            diameter: 2,
+            orbitSpeed: 1.8,
+            parentBody: "Neptune",
+            color: "#8888aa",
+            type: "tinymoon",
+            inclination: 0.04,
             orbitGroup: 3
         },
         {
@@ -750,36 +972,34 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const parentDiameter = parseFloat(parentElement.style.width);
             
-            Object.keys(moonsByParent[parentName]).forEach(groupId => {
-                if (groupId === 'individual') return;
+            // Calculate orbit radii with better spacing
+            let baseOrbitRadius = parentDiameter * 0.8; // Starting point for orbits
+            let orbitGap = parentDiameter * 0.25; // Gap between orbit groups
+            
+            // Determine how many orbit groups exist for this parent
+            const orbitGroups = Object.keys(moonsByParent[parentName]).filter(group => group !== 'individual');
+            
+            // Assign orbit radii to each group
+            orbitGroups.forEach((groupId, index) => {
+                // Make outer orbits for larger moons, inner orbits for smaller moons
+                // This reverses the original logic to match your requirements
+                const orbitRadius = baseOrbitRadius + (orbitGroups.length - index - 1) * orbitGap;
                 
-                const moonsInGroup = moonsByParent[parentName][groupId];
-                if (moonsInGroup.length === 0) return;
-                
-                // Find largest orbit radius in group
-                let largestRadius = 0;
-                moonsInGroup.forEach(moon => {
-                    let scaledRadius = moon.orbitRadius;
-                    if (parentName === "Saturn") {
-                        scaledRadius = Math.max(scaledRadius, parentDiameter * 0.7);
-                    } else {
-                        scaledRadius = Math.max(scaledRadius, parentDiameter * 0.6);
-                    }
-                    
-                    if (scaledRadius > largestRadius) largestRadius = scaledRadius;
-                });
-                
-                // Create the group orbit
                 const orbit = document.createElement('div');
                 orbit.className = 'moon-orbit';
                 orbit.setAttribute('data-orbit-group', groupId);
                 orbit.setAttribute('data-parent', parentName);
+                orbit.setAttribute('data-group-radius', orbitRadius);
+                
+                const moonsInGroup = moonsByParent[parentName][groupId];
+                if (moonsInGroup.length === 0) return;
+                
                 orbit.setAttribute('data-moon-type', moonsInGroup[0].type || 'moon');
                 
-                orbit.style.width = `${largestRadius * 2}px`;
-                orbit.style.height = `${largestRadius * 2}px`;
-                orbit.style.left = `${(parentDiameter - largestRadius * 2) / 2}px`;
-                orbit.style.top = `${(parentDiameter - largestRadius * 2) / 2}px`;
+                orbit.style.width = `${orbitRadius * 2}px`;
+                orbit.style.height = `${orbitRadius * 2}px`;
+                orbit.style.left = `${(parentDiameter - orbitRadius * 2) / 2}px`;
+                orbit.style.top = `${(parentDiameter - orbitRadius * 2) / 2}px`;
                 orbit.style.borderColor = 'rgba(255, 255, 255, 0.25)';
                 
                 const inclination = moonsInGroup[0].inclination || 0;
@@ -789,32 +1009,61 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 parentElement.appendChild(orbit);
                 
-                // Update all moons to use the same radius
-                moonsInGroup.forEach(moon => {
-                    moon.adjustedRadius = largestRadius;
+                // Update all moons in this group to use the same radius
+                moonsInGroup.forEach((moon, moonIndex) => {
+                    moon.adjustedRadius = orbitRadius;
+                    // Distribute moons evenly around the orbit
+                    moon.initialAngle = (moonIndex / moonsInGroup.length) * Math.PI * 2;
                 });
             });
+            
+            // Handle individual moons if any
+            if (moonsByParent[parentName]['individual'] && moonsByParent[parentName]['individual'].length > 0) {
+                const individualMoons = moonsByParent[parentName]['individual'];
+                
+                // Position individual moons at custom orbits
+                individualMoons.forEach((moon, index) => {
+                    const customOrbitRadius = baseOrbitRadius + (individualMoons.length - index - 1) * (orbitGap * 0.7);
+                    
+                    const orbit = document.createElement('div');
+                    orbit.className = 'moon-orbit';
+                    orbit.setAttribute('data-moon', moon.name);
+                    orbit.setAttribute('data-moon-type', moon.type || "moon");
+                    orbit.style.width = `${customOrbitRadius * 2}px`;
+                    orbit.style.height = `${customOrbitRadius * 2}px`;
+                    orbit.style.left = `${(parentDiameter - customOrbitRadius * 2) / 2}px`;
+                    orbit.style.top = `${(parentDiameter - customOrbitRadius * 2) / 2}px`;
+                    orbit.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                    
+                    if (moon.inclination) {
+                        orbit.style.transform = `rotateX(${moon.inclination * 180}deg)`;
+                    }
+                    
+                    parentElement.appendChild(orbit);
+                    
+                    moon.adjustedRadius = customOrbitRadius;
+                    moon.initialAngle = Math.random() * Math.PI * 2; // Random starting position
+                });
+            }
         });
         
-        // Now create the moons
+        // Now create the moons with their correct orbital positions
         Object.keys(moonsByParent).forEach(parentName => {
             const parentElement = document.querySelector(`.${parentName.toLowerCase()}`);
             if (!parentElement) return;
             
             const parentDiameter = parseFloat(parentElement.style.width);
             
-            // First create individual moons
-            if (moonsByParent[parentName]['individual']) {
-                moonsByParent[parentName]['individual'].forEach(moon => {
-                    const angle = Math.random() * Math.PI * 2;
-                    let orbitRadius = moon.orbitRadius;
-                    
-                    if (parentName === "Saturn") {
-                        orbitRadius = Math.max(orbitRadius,
-                                       parentDiameter * 0.8);
-                    } else {
-                        orbitRadius = Math.max(orbitRadius, parentDiameter * 0.7);
-                    }
+            // First handle grouped moons
+            Object.keys(moonsByParent[parentName]).forEach(groupId => {
+                if (groupId === 'individual') return;
+                
+                const moonsInGroup = moonsByParent[parentName][groupId];
+                if (moonsInGroup.length === 0) return;
+                
+                moonsInGroup.forEach((moon, index) => {
+                    const angle = moon.initialAngle || (index / moonsInGroup.length) * Math.PI * 2;
+                    const orbitRadius = moon.adjustedRadius;
                     
                     const element = document.createElement('div');
                     element.className = `celestial-body moon ${moon.name.toLowerCase()}`;
@@ -842,22 +1091,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     element.appendChild(bodyContent);
                     parentElement.appendChild(element);
                     
-                    const orbit = document.createElement('div');
-                    orbit.className = 'moon-orbit';
-                    orbit.setAttribute('data-moon', moon.name);
-                    orbit.setAttribute('data-moon-type', moon.type || "moon");
-                    orbit.style.width = `${orbitRadius * 2}px`;
-                    orbit.style.height = `${orbitRadius * 2}px`;
-                    orbit.style.left = `${(parentDiameter - orbitRadius * 2) / 2}px`;
-                    orbit.style.top = `${(parentDiameter - orbitRadius * 2) / 2}px`;
-                    orbit.style.borderColor = 'rgba(255, 255, 255, 0.25)';
-                    
-                    if (moon.inclination) {
-                        orbit.style.transform = `rotateX(${moon.inclination * 180}deg)`;
-                    }
-                    
-                    parentElement.appendChild(orbit);
-                    
                     element.addEventListener('click', function(e) {
                         e.stopPropagation();
                         window.location.href = `detail.html?body=${moon.name.toLowerCase()}`;
@@ -878,33 +1111,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     element.dataset.angle = angle;
-                    element.dataset.orbitSpeed = moon.orbitSpeed;
+                    element.dataset.orbitSpeed = moon.orbitSpeed || (3.0 - orbitGroups.indexOf(groupId) * 0.7); // Faster speeds for inner orbits
                     element.dataset.orbitRadius = orbitRadius;
                     element.dataset.adjustedRadius = orbitRadius;
                     element.dataset.parentBody = moon.parentBody;
+                    element.dataset.orbitGroup = groupId;
                 });
-            }
+            });
             
-            Object.keys(moonsByParent[parentName]).forEach(groupId => {
-                if (groupId === 'individual') return;
-                
-                const moonsInGroup = moonsByParent[parentName][groupId];
-                if (moonsInGroup.length === 0) return;
-                
-                let largestRadius = 0;
-                moonsInGroup.forEach(moon => {
-                    let scaledRadius = moon.orbitRadius;
-                    if (parentName === "Saturn") {
-                        scaledRadius = Math.max(scaledRadius, parentDiameter * 0.8);
-                    } else {
-                        scaledRadius = Math.max(scaledRadius, parentDiameter * 0.7);
-                    }
-                    
-                    if (scaledRadius > largestRadius) largestRadius = scaledRadius;
-                });
-                
-                moonsInGroup.forEach((moon, index) => {
-                    const angle = (index / moonsInGroup.length) * Math.PI * 2;
+            // Then handle individual moons
+            if (moonsByParent[parentName]['individual']) {
+                moonsByParent[parentName]['individual'].forEach(moon => {
+                    const angle = moon.initialAngle || Math.random() * Math.PI * 2;
+                    const orbitRadius = moon.adjustedRadius;
                     
                     const element = document.createElement('div');
                     element.className = `celestial-body moon ${moon.name.toLowerCase()}`;
@@ -914,8 +1133,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     element.style.height = `${moon.diameter}px`;
                     element.style.zIndex = 60;
                     
-                    const moonX = largestRadius * Math.cos(angle);
-                    const moonY = largestRadius * Math.sin(angle);
+                    const moonX = orbitRadius * Math.cos(angle);
+                    const moonY = orbitRadius * Math.sin(angle);
                     element.style.left = `${(parentDiameter - moon.diameter) / 2 + moonX}px`;
                     element.style.top = `${(parentDiameter - moon.diameter) / 2 + moonY}px`;
                     
@@ -952,13 +1171,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     element.dataset.angle = angle;
-                    element.dataset.orbitSpeed = moon.orbitSpeed;
-                    element.dataset.orbitRadius = largestRadius;
-                    element.dataset.adjustedRadius = largestRadius;
+                    element.dataset.orbitSpeed = moon.orbitSpeed || 2.0; // Default orbit speed if not specified
+                    element.dataset.orbitRadius = orbitRadius;
+                    element.dataset.adjustedRadius = orbitRadius;
                     element.dataset.parentBody = moon.parentBody;
-                    element.dataset.orbitGroup = groupId;
                 });
-            });
+            }
         });
         
         createAsteroidBelt();
@@ -1300,4 +1518,4 @@ window.addEventListener('load', function() {
             loadingScreen.style.display = 'none';
         }
     }, 3000);
-});        
+});
