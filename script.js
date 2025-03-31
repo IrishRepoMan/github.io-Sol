@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const solarSystem = document.getElementById('solar-system');
     const minZoom = 0.2;
-    const maxZoom = 1.5;
+    const maxZoom = 4;
     let currentZoom = 0.2;
     let isDragging = false;
     let startDragX, startDragY;
@@ -1097,12 +1097,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     element.addEventListener('mouseenter', function(e) {
-                        if (this.querySelector('.tooltip')) {
-                            this.querySelector('.tooltip').style.display = 'block';
-                            this.querySelector('.tooltip').style.transform = `scale(${1/currentZoom})`;
-                        }
-                        e.stopPropagation();
-                    });
+    // Stop other tooltips from showing
+    document.querySelectorAll('.tooltip').forEach(t => {
+        t.style.display = 'none';
+    });
+    
+    // Show only this element's tooltip
+    if (this.querySelector('.tooltip')) {
+        this.querySelector('.tooltip').style.display = 'block';
+        this.querySelector('.tooltip').style.transform = `scale(${1/currentZoom})`;
+    }
+    e.stopPropagation(); // Prevent event from bubbling up
+});
                     
                     element.addEventListener('mouseleave', function() {
                         if (this.querySelector('.tooltip')) {
@@ -1404,30 +1410,33 @@ document.addEventListener('DOMContentLoaded', function() {
         isDragging = false;
     });
     
-    document.addEventListener('wheel', function(e) {
-        e.preventDefault();
-        
-        const oldZoom = currentZoom;
-        
-        const rect = document.getElementById('universe').getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        
-        if (e.deltaY < 0) {
-            currentZoom = Math.min(currentZoom * 1.1, maxZoom);
-        } else {
-            currentZoom = Math.max(currentZoom * 0.9, minZoom);
-        }
-        
-        const zoomRatio = currentZoom / oldZoom;
-        const targetX = (mouseX - rect.width/2);
-        const targetY = (mouseY - rect.height/2);
-        
-        currentX = currentX - (targetX * (zoomRatio - 1));
-        currentY = currentY - (targetY * (zoomRatio - 1));
-        
-        updateTransform();
-    }, { passive: false });
+   document.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    
+    const oldZoom = currentZoom;
+    
+    // Get cursor position relative to the universe container
+    const rect = document.getElementById('universe').getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    // Calculate cursor position in the solar system's coordinate space
+    const worldX = (mouseX - rect.width/2 - currentX) / currentZoom;
+    const worldY = (mouseY - rect.height/2 - currentY) / currentZoom;
+    
+    // Adjust zoom level
+    if (e.deltaY < 0) {
+        currentZoom = Math.min(currentZoom * 1.2, maxZoom); // Increase zoom factor for faster zooming
+    } else {
+        currentZoom = Math.max(currentZoom * 0.8, minZoom);
+    }
+    
+    // Calculate new screen position after zoom to keep cursor at same world position
+    currentX = mouseX - worldX * currentZoom - rect.width/2;
+    currentY = mouseY - worldY * currentZoom - rect.height/2;
+    
+    updateTransform();
+}, { passive: false });
     
     let touchStartX, touchStartY, touchStartDist;
     let lastTouchEnd = 0;
