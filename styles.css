@@ -439,3 +439,75 @@ body, html {
     background: linear-gradient(30deg, #8888aa, #9999bb, #aaaacc);
     box-shadow: 0 0 5px rgba(153, 153, 187, 0.7);
 }
+
+/* Additional Moon Styles */
+.metis .body-content {
+    background: linear-gradient(30deg, #cc8866, #dd9944, #eeaa66);
+    box-shadow: 0 0 4px rgba(204, 136, 102, 0.7);
+}
+
+.adrastea .body-content {
+    background: linear-gradient(30deg, #dd9944, #eebb66, #ffcc88);
+    box-shadow: 0 0 3px rgba(221, 153, 68, 0.7);
+}
+
+.hyperion .body-content {
+    background: linear-gradient(30deg, #99aacc, #aabbcc, #bbccdd);
+    box-shadow: 0 0 5px rgba(153, 170, 204, 0.7);
+}
+
+.phoebe .body-content {
+    background: linear-gradient(30deg, #667788, #778899, #8899aa);
+    box-shadow: 0 0 4px rgba(119, 136, 153, 0.7);
+}
+
+.puck .body-content {
+    background: linear-gradient(30deg, #99bb99, #aaccaa, #bbddbb);
+    box-shadow: 0 0 4px rgba(170, 204, 170, 0.7);
+}
+
+.larissa .body-content {
+    background: linear-gradient(30deg, #8899bb, #99aacc, #aabbdd);
+    box-shadow: 0 0 4px rgba(153, 170, 204, 0.7);
+}
+
+.galatea .body-content {
+    background: linear-gradient(30deg, #7788aa, #8899bb, #99aacc);
+    box-shadow: 0 0 4px rgba(136, 153, 187, 0.7);
+}
+
+/* Enhanced Orbit Group Styling */
+.moon-orbit[data-orbit-group="1"] {
+    border-color: rgba(255, 255, 255, 0.5);
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
+}
+
+.moon-orbit[data-orbit-group="2"] {
+    border-color: rgba(200, 200, 255, 0.4);
+    filter: drop-shadow(0 0 2px rgba(200, 200, 255, 0.1));
+}
+
+.moon-orbit[data-orbit-group="3"] {
+    border-color: rgba(150, 150, 255, 0.3);
+    filter: drop-shadow(0 0 1px rgba(150, 150, 255, 0.1));
+}
+
+/* Size-based styling for better visual hierarchy */
+.celestial-body[data-body-type="moon"] {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+}
+
+.celestial-body[data-body-type="smallmoon"] {
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
+}
+
+/* Responsive adjustments for moon visibility */
+@media (max-width: 768px) {
+    .moon-orbit {
+        opacity: 0.7 !important;
+    }
+    
+    .celestial-body[data-body-type="smallmoon"] {
+        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.1));
+    }
+}
